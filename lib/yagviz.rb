@@ -29,12 +29,13 @@ class Yagviz
     end
   end
 
-  attr_reader :gnode_attrs, :gedge_attrs
+  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs
   def initialize
     @edges = {}
     @nodes = {}
     @gnode_attrs = {}
     @gedge_attrs = {}
+    @graph_attrs = {}
   end
   
   def nodeset
@@ -67,6 +68,10 @@ class Yagviz
   def edges(attrs)
     @gedge_attrs.update(attrs)
   end
+
+  def global(attrs)
+    @graph_attrs.update(attrs)
+  end
   
   def graph(&blk)
     instance_eval(&blk)
@@ -92,23 +97,28 @@ class Yagviz
 
   def to_s
     result = []
+    tabs = "  "
     result << "digraph {"
 
+    unless graph_attrs.empty?
+      result << tabs + build_attrs(graph_attrs, false).join(";\n#{tabs}") + ";"
+    end
+
     unless gnode_attrs.empty?
-      result << "  node#{build_attrs(gnode_attrs)};"
+      result << tabs + "node#{build_attrs(gnode_attrs)};"
     end
     
     unless gedge_attrs.empty?
-      result << "  edge#{build_attrs(gedge_attrs)};"
+      result << tabs + "edge#{build_attrs(gedge_attrs)};"
     end
     
     @nodes.values.each do |node|
       attrs = build_attrs(node.attrs)
-      result << "  #{node.id}#{attrs};"
+      result << tabs + "#{node.id}#{attrs};"
     end
     @edges.values.each do |edge|
       attrs = build_attrs(edge.attrs)
-      result << "  #{edge}#{attrs};"
+      result << tabs + "#{edge}#{attrs};"
     end
     
     result << "}\n"
@@ -123,9 +133,10 @@ class Yagviz
     @nodes
   end
 
-  def build_attrs(attrs)
+  def build_attrs(attrs, join=true)
     return nil if attrs.empty?
-    '[' + attrs.map { |k, v| %(#{k}="#{v}").gsub("\n", "\\n") }.join(',') + ']'
+    arr = attrs.map { |k, v| %(#{k}="#{v}").gsub("\n", "\\n") }
+    join ? '[' + arr.join(',') + ']' : arr
   end
 end
 

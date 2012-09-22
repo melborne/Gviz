@@ -178,6 +178,14 @@ describe Yagviz do
     end
   end
 
+  context "global" do
+    it "set global graph attributes" do
+      attrs = {:label => "A simple graph", :rankdir => "LR"}
+      @yag.global(attrs)
+      @yag.graph_attrs.should == attrs
+    end
+  end
+
   context "to_s(output dot data)" do
     it "without attrs" do
       @yag.add :main => [:init, :parse]
@@ -250,6 +258,20 @@ describe Yagviz do
       @yag.to_s.should eql ~<<-EOS
         digraph {
           edge[style="dotted",color="red"];
+          a;
+          b;
+          a -> b;
+        }
+        EOS
+    end
+
+    it "with global attributes" do
+      @yag.global(:label => "A Simple Graph", :rankdir => "LR")
+      @yag.add(:a => :b)
+      @yag.to_s.should eql ~<<-EOS
+        digraph {
+          label="A Simple Graph";
+          rankdir="LR";
           a;
           b;
           a -> b;
