@@ -29,10 +29,20 @@ class Yagviz
     end
   end
 
-  attr_reader :edges, :nodes
+  attr_reader :gnode_attrs, :gedge_attrs
   def initialize
     @edges = {}
     @nodes = {}
+    @gnode_attrs = {}
+    @gedge_attrs = {}
+  end
+  
+  def nodeset
+    @nodes.values
+  end
+
+  def edgeset
+    @edges.values
   end
 
   def node(id, attrs={})
@@ -48,6 +58,14 @@ class Yagviz
       @edges.update(id => edge)
       create_nodes
     end
+  end
+
+  def nodes(attrs)
+    @gnode_attrs.update(attrs)
+  end
+
+  def edges(attrs)
+    @gedge_attrs.update(attrs)
   end
   
   def graph(&blk)
@@ -70,16 +88,25 @@ class Yagviz
     end
     self
   end
+  alias :route :add
 
   def to_s
     result = []
     result << "digraph {"
+
+    unless gnode_attrs.empty?
+      result << "  node#{build_attrs(gnode_attrs)};"
+    end
     
-    nodes.values.each do |node|
+    unless gedge_attrs.empty?
+      result << "  edge#{build_attrs(gedge_attrs)};"
+    end
+    
+    @nodes.values.each do |node|
       attrs = build_attrs(node.attrs)
       result << "  #{node.id}#{attrs};"
     end
-    edges.values.each do |edge|
+    @edges.values.each do |edge|
       attrs = build_attrs(edge.attrs)
       result << "  #{edge}#{attrs};"
     end
@@ -91,9 +118,9 @@ class Yagviz
   private
   def create_nodes
     # only create unregistered nodes
-    ids = edges.values.flat_map(&:nodes).uniq - nodes.keys
+    ids = @edges.values.flat_map(&:nodes).uniq - @nodes.keys
     ids.each { |id| node(id) }
-    nodes
+    @nodes
   end
 
   def build_attrs(attrs)
