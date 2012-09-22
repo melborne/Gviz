@@ -113,12 +113,11 @@ class Yagviz
     end
     
     @nodes.values.each do |node|
-      attrs = build_attrs(node.attrs)
-      result << tabs + "#{node.id}#{attrs};"
+      result << tabs + "#{node.id}#{build_attrs(node.attrs)};"
     end
+
     @edges.values.each do |edge|
-      attrs = build_attrs(edge.attrs)
-      result << tabs + "#{edge}#{attrs};"
+      result << tabs + "#{edge}#{build_attrs(edge.attrs)};"
     end
     
     result << "}\n"
