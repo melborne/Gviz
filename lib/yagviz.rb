@@ -98,13 +98,24 @@ class Yagviz
 
   def build_attrs(attrs)
     return nil if attrs.empty?
-    '[' + attrs.map { |attr| attr.join("=") }.join(',') + ']'
+    '[' + attrs.map { |k, v| %(#{k}="#{v}").gsub("\n", "\\n") }.join(',') + ']'
   end
 end
 
 if __FILE__ == $0
   yag = Yagviz.new
-  yag.add :main => [:init, :parse, :cleanup, :printf]
+  yag.graph do
+    add(:main => [:printf, :parse, :init, :cleanup])
+    add(:parse => :execute, :init => :make)
+    add(:execute => [:printf, :compare, :make])
+    node(:main, :shape => 'box')
+    node(:make, :label => "make a\nstring")
+    node(:compare, :shape => 'box', :style => 'filled', :color => ".7 .3 1.0")
+    edge(:main_parse, :weight => 8)
+    edge(:main_init, :style => 'dotted')
+    edge(:main_printf, :style => 'bold', :label => "100 times", :color => 'red')
+    edge(:execute_compare, :color => 'red')
+  end
   puts yag
 end
 
