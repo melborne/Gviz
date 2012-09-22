@@ -142,8 +142,8 @@ describe Yagviz do
     end
   end
 
-  context "to_s" do
-    it "return dot data" do
+  context "to_s(output dot data)" do
+    it "without attrs" do
       @yag.add :main => [:init, :parse]
       @yag.add :init => :printf
       @yag.to_s.should eql ~<<-EOS
@@ -159,38 +159,56 @@ describe Yagviz do
           EOS
     end
 
-    it "return dot data with node attrs" do
+    it "with node attrs" do
       @yag.add :a => :b
       @yag.node(:a, :color => 'red', :style => 'filled')
       @yag.to_s.should eql ~<<-EOS
           digraph {
-            a[color=red,style=filled];
+            a[color="red",style="filled"];
             b;
             a -> b;
           }
           EOS
     end
 
-    it "return dot data with edge attrs" do
+    it "with edge attrs" do
       @yag.edge(:a_b, :color => 'red')
       @yag.to_s.should eql ~<<-EOS
           digraph {
             a;
             b;
-            a -> b[color=red];
+            a -> b[color="red"];
           }
           EOS
     end
 
-    it "return dot data with 2 edges with differenct attrs" do
+    it "with 2 edges with differenct attrs" do
       @yag.edge(:a_b, :color => 'red')
       @yag.edge(:a_b_1, :color => 'blue')
       @yag.to_s.should eql ~<<-EOS
         digraph {
           a;
           b;
-          a -> b[color=red];
-          a -> b[color=blue];
+          a -> b[color="red"];
+          a -> b[color="blue"];
+        }
+        EOS
+    end
+
+    it "handle carridge return in a label nicely" do
+      @yag.node(:a, :label => "hello\nworld")
+      @yag.to_s.should eql ~<<-EOS
+        digraph {
+          a[label="hello\\nworld"];
+        }
+        EOS
+    end
+
+    it "can handle unicode labels" do
+      @yag.node(:a, :label => "こんにちは、世界！")
+      @yag.to_s.should eql ~<<-EOS
+        digraph {
+          a[label="こんにちは、世界！"];
         }
         EOS
     end
