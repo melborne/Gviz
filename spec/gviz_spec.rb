@@ -1,196 +1,196 @@
 # encoding: UTF-8
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Yagviz do
+describe Gviz do
   before(:each) do
-    @yag = Yagviz.new
+    @g = Gviz.new
   end
 
   context "node" do
     it "add a node" do
-      node = @yag.node(:a)
-      node.should be_a_instance_of Yagviz::Node
+      node = @g.node(:a)
+      node.should be_a_instance_of Gviz::Node
       node.id.should eql :a
       node.attrs.should be_empty
-      @yag.nodeset.map(&:id).should eql [:a]
+      @g.nodeset.map(&:id).should eql [:a]
     end
 
     it "add nodes" do
-      @yag.node(:a)
-      @yag.node(:b)
-      @yag.nodeset.map(&:id).should eql [:a, :b]
+      @g.node(:a)
+      @g.node(:b)
+      @g.nodeset.map(&:id).should eql [:a, :b]
     end
 
     it "add a node with attrs" do
-      node = @yag.node(:a, :color => 'blue', :label => 'hello')
-      node.should be_a_instance_of Yagviz::Node
+      node = @g.node(:a, :color => 'blue', :label => 'hello')
+      node.should be_a_instance_of Gviz::Node
       node.id.should eql :a
       node.attrs.should == {:color => 'blue', :label => 'hello'}
-      @yag.nodeset.map(&:attrs).should eql [node.attrs]
+      @g.nodeset.map(&:attrs).should eql [node.attrs]
     end
 
     it "add nodes with same name & different attrs" do
-      @yag.node(:a, :color => 'blue', :label => 'hello')
-      @yag.node(:a, :color => 'red')
-      @yag.nodeset.first.attrs.should == {:color => 'red'}
+      @g.node(:a, :color => 'blue', :label => 'hello')
+      @g.node(:a, :color => 'red')
+      @g.nodeset.first.attrs.should == {:color => 'red'}
     end
 
     it "raise an error with a string" do
-      ->{ @yag.node('a') }.should raise_error(ArgumentError)
+      ->{ @g.node('a') }.should raise_error(ArgumentError)
     end
 
     it "raise an error with a symbol which include underscores" do
-      ->{ @yag.node(:a_b) }.should raise_error(ArgumentError)
+      ->{ @g.node(:a_b) }.should raise_error(ArgumentError)
     end
   end
 
   context "edge" do
     it "add a edge" do
-      edge = @yag.edge(:a_b)
-      edge.should be_a_instance_of Yagviz::Edge
+      edge = @g.edge(:a_b)
+      edge.should be_a_instance_of Gviz::Edge
       edge.st.should eql :a
       edge.ed.should eql :b
       edge.attrs.should be_empty
-      @yag.edgeset.map(&:to_s).should eql ["a -> b"]
+      @g.edgeset.map(&:to_s).should eql ["a -> b"]
     end
 
     it "add a edge with attrs" do
-      edge = @yag.edge(:a_b, :color => 'red', :arrowhead => 'none')
-      edge.should be_a_instance_of Yagviz::Edge
+      edge = @g.edge(:a_b, :color => 'red', :arrowhead => 'none')
+      edge.should be_a_instance_of Gviz::Edge
       edge.st.should eql :a
       edge.ed.should eql :b
       edge.attrs.should == {:color => 'red', :arrowhead => 'none'}
-      @yag.edgeset.map(&:to_s).should eql ["a -> b"]
+      @g.edgeset.map(&:to_s).should eql ["a -> b"]
     end
 
     it "overwrite same edge" do
-      @yag.edge(:a_b)
-      @yag.edge(:a_b, :color => 'red')
-      @yag.edgeset.map(&:to_s).should eql ["a -> b"]
-      @yag.edgeset.first.attrs.should == {:color => 'red'}
+      @g.edge(:a_b)
+      @g.edge(:a_b, :color => 'red')
+      @g.edgeset.map(&:to_s).should eql ["a -> b"]
+      @g.edgeset.first.attrs.should == {:color => 'red'}
     end
 
     it "add different edges, but same name" do
-      edge1 = @yag.edge(:a_b)
-      edge2 = @yag.edge(:a_b_1)
+      edge1 = @g.edge(:a_b)
+      edge2 = @g.edge(:a_b_1)
       edge1.seq.should eql 0
       edge2.seq.should eql 1
-      @yag.edgeset.map(&:to_s).should eql ["a -> b", "a -> b"]
+      @g.edgeset.map(&:to_s).should eql ["a -> b", "a -> b"]
     end
 
     it "raise an error with a string" do
-      ->{ @yag.edge('a_b') }.should raise_error(ArgumentError)
+      ->{ @g.edge('a_b') }.should raise_error(ArgumentError)
     end
   end
 
   context "add" do
     context "edges" do
       it "one to many" do
-        @yag.add :a => [:b, :c, :d]
-        @yag.edgeset.map(&:to_s).should eql ['a -> b', 'a -> c', 'a -> d']
-        @yag.nodeset.map(&:id).should eql [:a, :b, :c, :d]
+        @g.add :a => [:b, :c, :d]
+        @g.edgeset.map(&:to_s).should eql ['a -> b', 'a -> c', 'a -> d']
+        @g.nodeset.map(&:id).should eql [:a, :b, :c, :d]
       end
 
       it "many to many" do
-        @yag.add [:main, :sub] => [:a, :b, :c]
-        @yag.edgeset.map(&:to_s)
+        @g.add [:main, :sub] => [:a, :b, :c]
+        @g.edgeset.map(&:to_s)
             .should eql ['main -> a', 'main -> b', 'main -> c',
                          'sub -> a',  'sub -> b',  'sub -> c']
-        @yag.nodeset.map(&:id).should eql [:main, :a, :b, :c, :sub]
+        @g.nodeset.map(&:id).should eql [:main, :a, :b, :c, :sub]
       end
 
       it "sequence" do
-        @yag.add :main => :sub, :sub => [:a, :b]
-        @yag.edgeset.map(&:to_s)
+        @g.add :main => :sub, :sub => [:a, :b]
+        @g.edgeset.map(&:to_s)
             .should eql ['main -> sub', 'sub -> a', 'sub -> b']
-        @yag.nodeset.map(&:id).should eql [:main, :sub, :a, :b]
+        @g.nodeset.map(&:id).should eql [:main, :sub, :a, :b]
       end
 
       it "several sequences" do
-        @yag.add :main => :a, :a => [:c, :d]
-        @yag.add :main => :b, :b => [:e, :f]
-        @yag.edgeset.map(&:to_s)
+        @g.add :main => :a, :a => [:c, :d]
+        @g.add :main => :b, :b => [:e, :f]
+        @g.edgeset.map(&:to_s)
             .should eql ['main -> a', 'a -> c', 'a -> d',
                          'main -> b', 'b -> e', 'b -> f']
-        @yag.nodeset.map(&:id).should eql [:main, :a, :c, :d, :b, :e, :f]
+        @g.nodeset.map(&:id).should eql [:main, :a, :c, :d, :b, :e, :f]
       end
     end
 
     context "nodes" do
       it "add a node" do
-        @yag.add :a
-        @yag.nodeset.map(&:id).should eql [:a]
+        @g.add :a
+        @g.nodeset.map(&:id).should eql [:a]
       end
 
       it "add several nodes" do
-        @yag.add :a, :b, :c
-        @yag.nodeset.map(&:id).should eql [:a, :b, :c]
+        @g.add :a, :b, :c
+        @g.nodeset.map(&:id).should eql [:a, :b, :c]
       end
 
       it "raise error with a string" do
-        ->{ @yag.add 'a' }.should raise_error(ArgumentError)
+        ->{ @g.add 'a' }.should raise_error(ArgumentError)
       end
     end
   end
 
   context "graph" do
     it "add routes" do
-      @yag.graph do
+      @g.graph do
         add :main => [:a, :b, :c]
         add :a => [:d, :e]
       end
-      @yag.edgeset.map(&:to_s)
+      @g.edgeset.map(&:to_s)
           .should eql ['main -> a', 'main -> b', 'main -> c',
                        'a -> d', 'a -> e']
-      @yag.nodeset.map(&:id).should eql [:main, :a, :b, :c, :d, :e]
+      @g.nodeset.map(&:id).should eql [:main, :a, :b, :c, :d, :e]
     end
   end
 
   context "nodes" do
     it "set nodes attributes globally" do
       attr = {:style => "filled", :color => "purple"}
-      @yag.nodes(attr)
-      @yag.gnode_attrs.should == attr
+      @g.nodes(attr)
+      @g.gnode_attrs.should == attr
     end
     
     it "add nodes attributes globally" do
       attr = {:style => "filled", :color => "purple"}
       attr2 = {:color => "red", :shape => "box"}
-      @yag.nodes(attr)
-      @yag.nodes(attr2)
-      @yag.gnode_attrs.should == {:style => "filled", :color => "red", :shape => "box"}
+      @g.nodes(attr)
+      @g.nodes(attr2)
+      @g.gnode_attrs.should == {:style => "filled", :color => "red", :shape => "box"}
     end
   end
 
   context "edges" do
     it "set edges attributes globally" do
       attr = {:style => "dotted", :color => "purple"}
-      @yag.edges(attr)
-      @yag.gedge_attrs.should == attr
+      @g.edges(attr)
+      @g.gedge_attrs.should == attr
     end
 
     it "add edges attributes globally" do
       attr = {:style => "dotted", :color => "purple"}
       attr2 = {:color => "red", :arrowhead => "none"}
-      @yag.edges(attr)
-      @yag.edges(attr2)
-      @yag.gedge_attrs.should == {:style => "dotted", :color => "red", :arrowhead => "none"}
+      @g.edges(attr)
+      @g.edges(attr2)
+      @g.gedge_attrs.should == {:style => "dotted", :color => "red", :arrowhead => "none"}
     end
   end
 
   context "global" do
     it "set global graph attributes" do
       attrs = {:label => "A simple graph", :rankdir => "LR"}
-      @yag.global(attrs)
-      @yag.graph_attrs.should == attrs
+      @g.global(attrs)
+      @g.graph_attrs.should == attrs
     end
   end
 
   context "to_s(output dot data)" do
     it "without attrs" do
-      @yag.add :main => [:init, :parse]
-      @yag.add :init => :printf
-      @yag.to_s.should eql ~<<-EOS
+      @g.add :main => [:init, :parse]
+      @g.add :init => :printf
+      @g.to_s.should eql ~<<-EOS
           digraph {
             main;
             init;
@@ -204,9 +204,9 @@ describe Yagviz do
     end
 
     it "with node attrs" do
-      @yag.add :a => :b
-      @yag.node(:a, :color => 'red', :style => 'filled')
-      @yag.to_s.should eql ~<<-EOS
+      @g.add :a => :b
+      @g.node(:a, :color => 'red', :style => 'filled')
+      @g.to_s.should eql ~<<-EOS
           digraph {
             a[color="red",style="filled"];
             b;
@@ -216,8 +216,8 @@ describe Yagviz do
     end
 
     it "with edge attrs" do
-      @yag.edge(:a_b, :color => 'red')
-      @yag.to_s.should eql ~<<-EOS
+      @g.edge(:a_b, :color => 'red')
+      @g.to_s.should eql ~<<-EOS
           digraph {
             a;
             b;
@@ -227,9 +227,9 @@ describe Yagviz do
     end
 
     it "with 2 edges with different attrs" do
-      @yag.edge(:a_b, :color => 'red')
-      @yag.edge(:a_b_1, :color => 'blue')
-      @yag.to_s.should eql ~<<-EOS
+      @g.edge(:a_b, :color => 'red')
+      @g.edge(:a_b_1, :color => 'blue')
+      @g.to_s.should eql ~<<-EOS
         digraph {
           a;
           b;
@@ -240,9 +240,9 @@ describe Yagviz do
     end
 
     it "with global node attributes" do
-      @yag.nodes(:shape => 'box', :style => 'filled')
-      @yag.add(:a => :b)
-      @yag.to_s.should eql ~<<-EOS
+      @g.nodes(:shape => 'box', :style => 'filled')
+      @g.add(:a => :b)
+      @g.to_s.should eql ~<<-EOS
         digraph {
           node[shape="box",style="filled"];
           a;
@@ -253,9 +253,9 @@ describe Yagviz do
     end
 
     it "with global edges attributes" do
-      @yag.edges(:style => 'dotted', :color => 'red')
-      @yag.add(:a => :b)
-      @yag.to_s.should eql ~<<-EOS
+      @g.edges(:style => 'dotted', :color => 'red')
+      @g.add(:a => :b)
+      @g.to_s.should eql ~<<-EOS
         digraph {
           edge[style="dotted",color="red"];
           a;
@@ -266,9 +266,9 @@ describe Yagviz do
     end
 
     it "with global attributes" do
-      @yag.global(:label => "A Simple Graph", :rankdir => "LR")
-      @yag.add(:a => :b)
-      @yag.to_s.should eql ~<<-EOS
+      @g.global(:label => "A Simple Graph", :rankdir => "LR")
+      @g.add(:a => :b)
+      @g.to_s.should eql ~<<-EOS
         digraph {
           label="A Simple Graph";
           rankdir="LR";
@@ -280,8 +280,8 @@ describe Yagviz do
     end
 
     it "handle carridge return in a label nicely" do
-      @yag.node(:a, :label => "hello\nworld")
-      @yag.to_s.should eql ~<<-EOS
+      @g.node(:a, :label => "hello\nworld")
+      @g.to_s.should eql ~<<-EOS
         digraph {
           a[label="hello\\nworld"];
         }
@@ -289,8 +289,8 @@ describe Yagviz do
     end
 
     it "can handle unicode labels" do
-      @yag.node(:a, :label => "こんにちは、世界！")
-      @yag.to_s.should eql ~<<-EOS
+      @g.node(:a, :label => "こんにちは、世界！")
+      @g.to_s.should eql ~<<-EOS
         digraph {
           a[label="こんにちは、世界！"];
         }

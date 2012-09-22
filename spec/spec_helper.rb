@@ -1,4 +1,4 @@
-require "yagviz"
+require "gviz"
 require "rspec"
 
 class String

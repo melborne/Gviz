@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'yagviz/version'
+require 'gviz/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "yagviz"
-  gem.version       = Yagviz::VERSION
+  gem.name          = "gviz"
+  gem.version       = Gviz::VERSION
   gem.authors       = ["kyoendo"]
   gem.email         = ["postagie@gmail.com"]
   gem.description   = %q{TODO: Write a gem description}

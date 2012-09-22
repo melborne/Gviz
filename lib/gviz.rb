@@ -1,4 +1,4 @@
-class Yagviz
+class Gviz
   class Node < Struct.new(:id, :attrs)
     def initialize(id, attrs={})
       raise ArgumentError, "`id` must not include underscores" if id.match(/_/)
@@ -140,7 +140,7 @@ class Yagviz
 end
 
 if __FILE__ == $0
-  yag = Yagviz.new
+  yag = Gviz.new
   yag.graph do
     add(:main => [:printf, :parse, :init, :cleanup])
     add(:parse => :execute, :init => :make)
