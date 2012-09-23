@@ -38,13 +38,15 @@ class Gviz
     end
   end
 
-  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs
-  def initialize
+  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs
+  def initialize(name=:G, type=:digraph)
+    @name, @type = name, type
     @edges = {}
     @nodes = {}
     @gnode_attrs = {}
     @gedge_attrs = {}
     @graph_attrs = {}
+    @subgraphs = []
   end
   
   def nodeset
@@ -81,6 +83,13 @@ class Gviz
   def global(attrs)
     @graph_attrs.update(attrs)
   end
+
+  def subgraph(&blk)
+    Gviz.new("cluster#{subgraphs.size}", :subgraph).tap do |graph|
+      subgraphs << graph
+      graph.instance_eval &blk
+    end
+  end
   
   def graph(&blk)
     instance_eval(&blk)
@@ -107,7 +116,7 @@ class Gviz
   def to_s
     result = []
     tabs = "  "
-    result << "digraph {"
+    result << "#{@type} #{@name} {"
 
     unless graph_attrs.empty?
       result << tabs + build_attrs(graph_attrs, false).join(";\n#{tabs}") + ";"
@@ -127,6 +136,12 @@ class Gviz
 
     @edges.values.each do |edge|
       result << tabs + "#{edge}#{build_attrs(edge.attrs)};"
+    end
+
+    subgraphs.each do |graph|
+      graph.to_s.lines do |line|
+        result << tabs + line.chomp
+      end
     end
     
     result << "}\n"
@@ -149,8 +164,8 @@ class Gviz
 end
 
 if __FILE__ == $0
-  yag = Gviz.new
-  yag.graph do
+  g = Gviz.new
+  g.graph do
     add(:main => [:printf, :parse, :init, :cleanup])
     add(:parse => :execute, :init => :make)
     add(:execute => [:printf, :compare, :make])
@@ -162,6 +177,6 @@ if __FILE__ == $0
     edge(:main_printf, :style => 'bold', :label => "100 times", :color => 'red')
     edge(:execute_compare, :color => 'red')
   end
-  puts yag
+  puts g
 end
 

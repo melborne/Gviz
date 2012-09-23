@@ -164,6 +164,19 @@ describe Gviz do
     end
   end
 
+  context "subgraph" do
+    it "add subgraph" do
+      sub = @g.subgraph do
+        add :main => [:a, :b]
+      end
+      @g.subgraphs.should eql [sub]
+    end
+
+    it "raise error when name is not start with 'cluster'" do
+      ->{ @g.subgraph(:clu) {} }.should raise_error
+    end
+  end
+
   context "nodes" do
     it "set nodes attributes globally" do
       attr = {:style => "filled", :color => "purple"}
@@ -209,7 +222,7 @@ describe Gviz do
       @g.add :main => [:init, :parse]
       @g.add :init => :printf
       @g.to_s.should eql ~<<-EOS
-          digraph {
+          digraph G {
             main;
             init;
             parse;
@@ -225,7 +238,7 @@ describe Gviz do
       @g.add :a => :b
       @g.node(:a, :color => 'red', :style => 'filled')
       @g.to_s.should eql ~<<-EOS
-          digraph {
+          digraph G {
             a[color="red",style="filled"];
             b;
             a -> b;
@@ -236,7 +249,7 @@ describe Gviz do
     it "with edge attrs" do
       @g.edge(:a_b, :color => 'red')
       @g.to_s.should eql ~<<-EOS
-          digraph {
+          digraph G {
             a;
             b;
             a -> b[color="red"];
@@ -248,7 +261,7 @@ describe Gviz do
       @g.edge(:a_b, :color => 'red')
       @g.edge(:a_b_1, :color => 'blue')
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           a;
           b;
           a -> b[color="red"];
@@ -261,7 +274,7 @@ describe Gviz do
       @g.nodes(:shape => 'box', :style => 'filled')
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           node[shape="box",style="filled"];
           a;
           b;
@@ -274,7 +287,7 @@ describe Gviz do
       @g.edges(:style => 'dotted', :color => 'red')
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           edge[style="dotted",color="red"];
           a;
           b;
@@ -287,7 +300,7 @@ describe Gviz do
       @g.global(:label => "A Simple Graph", :rankdir => "LR")
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           label="A Simple Graph";
           rankdir="LR";
           a;
@@ -297,10 +310,10 @@ describe Gviz do
         EOS
     end
 
-    it "handle carridge return in a label nicely" do
+    it "handle newline in a label nicely" do
       @g.node(:a, :label => "hello\nworld")
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           a[label="hello\\nworld"];
         }
         EOS
@@ -309,7 +322,7 @@ describe Gviz do
     it "can handle unicode labels" do
       @g.node(:a, :label => "こんにちは、世界！")
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           a[label="こんにちは、世界！"];
         }
         EOS
@@ -321,12 +334,31 @@ describe Gviz do
       @g.node(:a, label:"<n> a | b |<p> c")
       @g.node(:c, label:"<o> d | e |<f> f")
       @g.to_s.should eql ~<<-EOS
-        digraph {
+        digraph G {
           a[label="<n> a | b |<p> c"];
           b;
           c[label="<o> d | e |<f> f"];
           a -> b;
           a:n -> c:f;
+        }
+        EOS
+    end
+
+    it "with subgraph" do
+      @g.route(:a => :b)
+      @g.subgraph do
+        route :c => :d
+      end
+      @g.to_s.should eql ~<<-EOS
+        digraph G {
+          a;
+          b;
+          a -> b;
+          subgraph cluster0 {
+            c;
+            d;
+            c -> d;
+          }
         }
         EOS
     end
