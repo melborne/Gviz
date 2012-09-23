@@ -1,12 +1,12 @@
-# Yagviz
+# Gviz
 
-TODO: Write a gem description
+Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'yagviz'
+    gem 'gviz'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install yagviz
+    $ gem install gviz
 
 ## Usage
 

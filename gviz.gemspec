@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["postagie@gmail.com"]
   gem.description   = %q{Ruby's interface of graphviz}
   gem.summary       = %q{Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/melborne/Gviz"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
