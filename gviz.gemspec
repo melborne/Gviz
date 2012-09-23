@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Gviz::VERSION
   gem.authors       = ["kyoendo"]
   gem.email         = ["postagie@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Ruby's interface of graphviz}
+  gem.summary       = %q{Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
