@@ -78,8 +78,26 @@ describe Gviz do
       @g.edgeset.map(&:to_s).should eql ["a -> b", "a -> b"]
     end
 
-    it "raise an error with a string" do
-      ->{ @g.edge('a_b') }.should raise_error(ArgumentError)
+    it "can accept a string id" do
+      @g.edge('a_b')
+      @g.edgeset.first.to_s.should eql "a -> b"
+    end
+
+    it "can take ports with a string id" do
+      @g.edge("a:n_b:f")
+      edge = @g.edgeset.first
+      edge.st.should eql :a
+      edge.ed.should eql :b
+      edge.st_port.should eql :n
+      edge.ed_port.should eql :f
+      edge.to_s.should eql "a:n -> b:f"
+    end
+    
+    it "can take ports with a string id 2" do
+      @g.add(:a => :b)
+      @g.edge("a:n_b:f", color:'red')
+      @g.edgeset.map(&:id).should eql [:a_b]
+      
     end
   end
 
@@ -293,6 +311,22 @@ describe Gviz do
       @g.to_s.should eql ~<<-EOS
         digraph {
           a[label="こんにちは、世界！"];
+        }
+        EOS
+    end
+    
+    it "take port on edges" do
+      @g.route(:a => [:b, :c])
+      @g.edge("a:n_c:f")
+      @g.node(:a, label:"<n> a | b |<p> c")
+      @g.node(:c, label:"<o> d | e |<f> f")
+      @g.to_s.should eql ~<<-EOS
+        digraph {
+          a[label="<n> a | b |<p> c"];
+          b;
+          c[label="<o> d | e |<f> f"];
+          a -> b;
+          a:n -> c:f;
         }
         EOS
     end

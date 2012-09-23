@@ -11,21 +11,30 @@ class Gviz
   end
 
   class Edge < Struct.new(:id, :attrs)
-    attr_reader :st, :ed, :seq
+    attr_reader :st, :ed, :seq, :st_port, :ed_port
     def initialize(id, attrs={})
       raise ArgumentError, "`attrs` must a hash" unless attrs.is_a?(Hash)
-      st, ed, seq = "#{id}".split('_')
-      @st, @ed = [st, ed].map(&:intern)
-      @seq = seq.to_i
-      super
+      id, @st, @ed, @seq, @st_port, @ed_port = parse_id(id)
+      super(id, attrs)
     end
 
     def to_s
-      "#{st} -> #{ed}"
+      stp = ":#{st_port}" if st_port
+      edp = ":#{ed_port}" if ed_port
+      "#{st}#{stp} -> #{ed}#{edp}"
     end
 
     def nodes
       [st, ed]
+    end
+
+    private
+    def parse_id(id)
+      st, ed, seq = "#{id}".split('_')
+      st, st_port = st.split(':').map(&:intern)
+      ed, ed_port = ed.split(':').map(&:intern)
+      id = (seq ? [st, ed, seq] : [st, ed]).join('_').intern
+      [id, st, ed, seq.to_i, st_port, ed_port]
     end
   end
 
@@ -52,11 +61,11 @@ class Gviz
   end
 
   def edge(id, attrs={})
-    unless id.is_a?(Symbol) && id.match(/._./)
+    unless id.match(/._./)
       raise ArgumentError, '`id` must a symbol in which node names joined with "_"'
     end
     Edge[id, attrs].tap do |edge|
-      @edges.update(id => edge)
+      @edges.update(edge.id => edge)
       create_nodes
     end
   end
