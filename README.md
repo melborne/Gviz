@@ -1,6 +1,6 @@
 # Gviz
 
-Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax.
+Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax. Some implementations of `Gviz` are inspired by Ryan Davis's `Graph`.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+See examples.
 
 ## Contributing
 
