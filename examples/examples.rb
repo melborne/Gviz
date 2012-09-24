@@ -7,7 +7,7 @@ simple.graph do
   route :parse => :execute
   route :execute => [:make, :compare, :printf]
 end
-# puts simple
+# simple.save(:a, :svg)
 
 enhanced = Gviz.new
 enhanced.graph do
@@ -68,4 +68,4 @@ sub.graph do
   node(:start, shape:'Mdiamond')
   node(:end, shape:'Msquare')
 end
-puts sub
+# sub.save('a', 'png')

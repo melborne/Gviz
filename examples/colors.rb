@@ -15,7 +15,6 @@ g.graph do
 end
 
 puts g
-
 __END__
 aliceblue
 antiquewhite
