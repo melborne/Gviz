@@ -93,6 +93,7 @@ class Gviz
   
   def graph(&blk)
     instance_eval(&blk)
+    self
   end
 
   def add(*nodes_or_routes)
@@ -146,6 +147,11 @@ class Gviz
     
     result << "}\n"
     result.join("\n")
+  end
+
+  def save(path, type=nil)
+    File.open("#{path}.dot", "w") { |f| f.puts self }
+    system "dot -T#{type} #{path}.dot -o #{path}.#{type}" if type
   end
   
   private
