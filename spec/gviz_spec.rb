@@ -29,10 +29,10 @@ describe Gviz do
       @g.nodeset.map(&:attrs).should eql [node.attrs]
     end
 
-    it "add nodes with same name & different attrs" do
-      @g.node(:a, :color => 'blue', :label => 'hello')
-      @g.node(:a, :color => 'red')
-      @g.nodeset.first.attrs.should == {:color => 'red'}
+    it "update node attrs" do
+      @g.node(:a, :color => 'red', :label => 'hello')
+      @g.node(:a, :color => 'blue', :shape => 'box')
+      @g.nodeset.first.attrs.should == {:color => 'blue', :label => 'hello', :shape => 'box'}
     end
 
     it "raise an error with a string" do
@@ -63,11 +63,11 @@ describe Gviz do
       @g.edgeset.map(&:to_s).should eql ["a -> b"]
     end
 
-    it "overwrite same edge" do
-      @g.edge(:a_b)
+    it "update edge attrs" do
+      @g.edge(:a_b, :color => 'blue', :style => 'bold')
       @g.edge(:a_b, :color => 'red')
       @g.edgeset.map(&:to_s).should eql ["a -> b"]
-      @g.edgeset.first.attrs.should == {:color => 'red'}
+      @g.edgeset.first.attrs.should == {:color => 'red', :style => 'bold'}
     end
 
     it "add different edges, but same name" do
