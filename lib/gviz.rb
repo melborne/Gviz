@@ -38,7 +38,7 @@ class Gviz
     end
   end
 
-  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs
+  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs, :ranks
   def initialize(name=:G, type=:digraph)
     @name, @type = name, type
     @edges = {}
@@ -47,6 +47,7 @@ class Gviz
     @gedge_attrs = {}
     @graph_attrs = {}
     @subgraphs = []
+    @ranks = []
   end
   
   def nodeset
@@ -114,6 +115,14 @@ class Gviz
   end
   alias :route :add
 
+  def rank(type, *nodes)
+    types = [:same, :min, :max, :source, :sink]
+    unless types.include?(type)
+      raise ArgumentError, "type must match any of #{types.join(', ')}"
+    end
+    @ranks << [type, nodes]
+  end
+
   def to_s
     result = []
     tabs = "  "
@@ -143,6 +152,10 @@ class Gviz
       graph.to_s.lines do |line|
         result << tabs + line.chomp
       end
+    end
+
+    @ranks.each do |type, nodes|
+      result << tabs + "{ rank=#{type}; #{nodes.join('; ')}; }"
     end
     
     result << "}\n"

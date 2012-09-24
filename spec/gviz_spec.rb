@@ -217,6 +217,14 @@ describe Gviz do
     end
   end
 
+  context "rank" do
+    it "let nodes be same rank" do
+      @g.route(:a => [:b, :c], :b => [:d, :e])
+      @g.rank(:same, :b, :d, :e)
+      @g.ranks.first.should eql [:same, [:b, :d, :e]]
+    end
+  end
+
   context "to_s(output dot data)" do
     it "without attrs" do
       @g.add :main => [:init, :parse]
@@ -359,6 +367,27 @@ describe Gviz do
             d;
             c -> d;
           }
+        }
+        EOS
+    end
+
+    it "with ranks" do
+      @g.route(:a => [:b, :c], :b => [:d, :e])
+      @g.rank(:same, :b, :d, :e)
+      @g.rank(:min, :c)
+      @g.to_s.should eql ~<<-EOS
+        digraph G {
+          a;
+          b;
+          c;
+          d;
+          e;
+          a -> b;
+          a -> c;
+          b -> d;
+          b -> e;
+          { rank=same; b; d; e; }
+          { rank=min; c; }
         }
         EOS
     end
