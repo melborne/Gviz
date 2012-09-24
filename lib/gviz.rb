@@ -59,7 +59,7 @@ class Gviz
 
   def node(id, attrs={})
     raise ArgumentError, '`id` must a symbol' unless id.is_a?(Symbol)
-    Node[id, attrs].tap { |node| @nodes.update(id => node) }
+    Node[id, attrs].tap { |node| @nodes.update(node.id => node) }
   end
 
   def edge(id, attrs={})
