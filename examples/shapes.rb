@@ -1,4 +1,4 @@
-# Arrow Varieties
+# Shape Varieties
 require_relative "../lib/gviz"
 
 shapes = DATA.lines.map(&:chomp).reject { |l| l.empty? }
