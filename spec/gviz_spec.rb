@@ -22,17 +22,17 @@ describe Gviz do
     end
 
     it "add a node with attrs" do
-      node = @g.node(:a, :color => 'blue', :label => 'hello')
+      node = @g.node(:a, color:'blue', label:'hello')
       node.should be_a_instance_of Gviz::Node
       node.id.should eql :a
-      node.attrs.should == {:color => 'blue', :label => 'hello'}
+      node.attrs.should == { color:'blue', label:'hello' }
       @g.nodeset.map(&:attrs).should eql [node.attrs]
     end
 
     it "update node attrs" do
-      @g.node(:a, :color => 'red', :label => 'hello')
-      @g.node(:a, :color => 'blue', :shape => 'box')
-      @g.nodeset.first.attrs.should == {:color => 'blue', :label => 'hello', :shape => 'box'}
+      @g.node(:a, color:'red', label:'hello')
+      @g.node(:a, color:'blue', shape:'box')
+      @g.nodeset.first.attrs.should == { color:'blue', label:'hello', shape:'box' }
     end
 
     it "raise an error with a string" do
@@ -55,19 +55,19 @@ describe Gviz do
     end
 
     it "add a edge with attrs" do
-      edge = @g.edge(:a_b, :color => 'red', :arrowhead => 'none')
+      edge = @g.edge(:a_b, color:'red', arrowhead:'none')
       edge.should be_a_instance_of Gviz::Edge
       edge.st.should eql :a
       edge.ed.should eql :b
-      edge.attrs.should == {:color => 'red', :arrowhead => 'none'}
+      edge.attrs.should == { color:'red', arrowhead:'none' }
       @g.edgeset.map(&:to_s).should eql ["a -> b"]
     end
 
     it "update edge attrs" do
-      @g.edge(:a_b, :color => 'blue', :style => 'bold')
-      @g.edge(:a_b, :color => 'red')
+      @g.edge(:a_b, color:'blue', style:'bold')
+      @g.edge(:a_b, color:'red')
       @g.edgeset.map(&:to_s).should eql ["a -> b"]
-      @g.edgeset.first.attrs.should == {:color => 'red', :style => 'bold'}
+      @g.edgeset.first.attrs.should == { color:'red', style:'bold' }
     end
 
     it "add different edges, but same name" do
@@ -179,39 +179,39 @@ describe Gviz do
 
   context "nodes" do
     it "set nodes attributes globally" do
-      attr = {:style => "filled", :color => "purple"}
+      attr = { style:"filled", color:"purple" }
       @g.nodes(attr)
       @g.gnode_attrs.should == attr
     end
     
     it "add nodes attributes globally" do
-      attr = {:style => "filled", :color => "purple"}
-      attr2 = {:color => "red", :shape => "box"}
+      attr = { style:"filled", color:"purple" }
+      attr2 = { color:"red", shape:"box" }
       @g.nodes(attr)
       @g.nodes(attr2)
-      @g.gnode_attrs.should == {:style => "filled", :color => "red", :shape => "box"}
+      @g.gnode_attrs.should == { style:"filled", color:"red", shape:"box" }
     end
   end
 
   context "edges" do
     it "set edges attributes globally" do
-      attr = {:style => "dotted", :color => "purple"}
+      attr = { style:"dotted", color:"purple" }
       @g.edges(attr)
       @g.gedge_attrs.should == attr
     end
 
     it "add edges attributes globally" do
-      attr = {:style => "dotted", :color => "purple"}
-      attr2 = {:color => "red", :arrowhead => "none"}
+      attr = { style:"dotted", color:"purple" }
+      attr2 = { color:"red", arrowhead:"none" }
       @g.edges(attr)
       @g.edges(attr2)
-      @g.gedge_attrs.should == {:style => "dotted", :color => "red", :arrowhead => "none"}
+      @g.gedge_attrs.should == { style:"dotted", color:"red", arrowhead:"none" }
     end
   end
 
   context "global" do
     it "set global graph attributes" do
-      attrs = {:label => "A simple graph", :rankdir => "LR"}
+      attrs = { label:"A simple graph", rankdir:"LR" }
       @g.global(attrs)
       @g.graph_attrs.should == attrs
     end
@@ -244,7 +244,7 @@ describe Gviz do
 
     it "with node attrs" do
       @g.add :a => :b
-      @g.node(:a, :color => 'red', :style => 'filled')
+      @g.node(:a, color:'red', style:'filled')
       @g.to_s.should eql ~<<-EOS
           digraph G {
             a[color="red",style="filled"];
@@ -255,7 +255,7 @@ describe Gviz do
     end
 
     it "with edge attrs" do
-      @g.edge(:a_b, :color => 'red')
+      @g.edge(:a_b, color:'red')
       @g.to_s.should eql ~<<-EOS
           digraph G {
             a;
@@ -266,8 +266,8 @@ describe Gviz do
     end
 
     it "with 2 edges with different attrs" do
-      @g.edge(:a_b, :color => 'red')
-      @g.edge(:a_b_1, :color => 'blue')
+      @g.edge(:a_b, color:'red')
+      @g.edge(:a_b_1, color:'blue')
       @g.to_s.should eql ~<<-EOS
         digraph G {
           a;
@@ -279,7 +279,7 @@ describe Gviz do
     end
 
     it "with global node attributes" do
-      @g.nodes(:shape => 'box', :style => 'filled')
+      @g.nodes(shape:'box', style:'filled')
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
         digraph G {
@@ -292,7 +292,7 @@ describe Gviz do
     end
 
     it "with global edges attributes" do
-      @g.edges(:style => 'dotted', :color => 'red')
+      @g.edges(style:'dotted', color:'red')
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
         digraph G {
@@ -305,7 +305,7 @@ describe Gviz do
     end
 
     it "with global attributes" do
-      @g.global(:label => "A Simple Graph", :rankdir => "LR")
+      @g.global(label:"A Simple Graph", rankdir:"LR")
       @g.add(:a => :b)
       @g.to_s.should eql ~<<-EOS
         digraph G {
@@ -319,7 +319,7 @@ describe Gviz do
     end
 
     it "handle newline in a label nicely" do
-      @g.node(:a, :label => "hello\nworld")
+      @g.node(:a, label:"hello\nworld")
       @g.to_s.should eql ~<<-EOS
         digraph G {
           a[label="hello\\nworld"];
@@ -328,7 +328,7 @@ describe Gviz do
     end
 
     it "can handle unicode labels" do
-      @g.node(:a, :label => "こんにちは、世界！")
+      @g.node(:a, label:"こんにちは、世界！")
       @g.to_s.should eql ~<<-EOS
         digraph G {
           a[label="こんにちは、世界！"];
