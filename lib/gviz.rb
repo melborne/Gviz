@@ -30,6 +30,7 @@ class Gviz
 
     private
     def parse_id(id)
+      raise ArgumentError, "id must not include other than words or a colon" if id.match(/[^\w:]/)
       st, ed, seq = "#{id}".split('_')
       st, st_port = st.split(':').map(&:intern)
       ed, ed_port = ed.split(':').map(&:intern)

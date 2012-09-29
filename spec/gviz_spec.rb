@@ -99,6 +99,12 @@ describe Gviz do
       @g.edgeset.map(&:id).should eql [:a_b]
       
     end
+
+    it "raise an error with a node which include other than words or colon" do
+      ->{ @g.edge "b c" }.should raise_error(ArgumentError)
+      ->{ @g.edge "b/c" }.should raise_error(ArgumentError)
+      ->{ @g.edge "bc!" }.should raise_error(ArgumentError)
+    end
   end
 
   context "add" do
