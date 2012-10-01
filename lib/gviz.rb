@@ -195,8 +195,8 @@ class Gviz
   end
 end
 
-def Graph(name, &blk)
-  Gviz.new(name).graph(&blk)
+def Graph(name=:G, type=:digraph, &blk)
+  Gviz.new(name, type).graph(&blk)
 end
 
 if __FILE__ == $0
