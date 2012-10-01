@@ -1,3 +1,5 @@
+require_relative "gviz/system_extension"
+
 class Gviz
   class Node < Struct.new(:id, :attrs)
     def initialize(id, attrs={})
