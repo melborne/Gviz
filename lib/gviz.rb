@@ -193,6 +193,10 @@ class Gviz
   end
 end
 
+def Graph(name, &blk)
+  Gviz.new(name).graph(&blk)
+end
+
 if __FILE__ == $0
   g = Gviz.new
   g.graph do

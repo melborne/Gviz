@@ -398,4 +398,22 @@ describe Gviz do
         EOS
     end
   end
+
+  context "Graph class method" do
+    it "create a gviz object" do
+      g = Graph(:X) do
+        add :a => [:b, :c]
+      end
+      g.should be_a_instance_of Gviz
+      g.to_s.should eql ~<<-EOS
+        digraph X {
+          a;
+          b;
+          c;
+          a -> b;
+          a -> c;
+        }
+        EOS
+    end
+  end
 end
