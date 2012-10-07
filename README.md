@@ -24,18 +24,21 @@ A simple example.
     # save to files with dot and png formats(save method)
     require "gviz"
     
-    gv = Gviz.new
-    gv.graph do
+    Graph do
       route :main => [:init, :parse, :cleanup, :printf]
       route :init => :make, :parse => :execute
       route :execute => [:make, :compare, :printf]
+
+      save(:sample1, :png)
     end
     
-    gv.save(:sample1, :png)
+`Graph` is a shortcut for `Gviz.new.graph`.
 
 This outputs `sample1.dot` and `sample1.png` files shown as below.
 
 ![sample1](http://github.com/melborne/Gviz/raw/master/examples/sample1.png)
+
+
 
 Add some attributes to the graph, nodes, edges.
 
@@ -45,8 +48,7 @@ Add some attributes to the graph, nodes, edges.
     ## add bgcolor to a graph(global method)
     require "gviz"
     
-    gv = Gviz.new
-    gv.graph do
+    Graph.graph do
       route :main => [:init, :parse, :cleanup, :printf]
       route :init => :make, :parse => :execute
       route :execute => [:make, :compare, :printf]
@@ -56,9 +58,9 @@ Add some attributes to the graph, nodes, edges.
       edges(arrowhead:'onormal', style:'bold', color:'magenta4')
       edge(:main_printf, arrowtail:'diamond', dir:'both', color:'#3355FF')
       global(bgcolor:'powderblue')
+
+      save(:sample2, :png)
     end
-    
-    gv.save(:sample2, :png)
 
 This outputs below.
 
@@ -72,8 +74,7 @@ Modify some.
     ## define subgraph(subgraph method) 
     require "gviz"
     
-    gv = Gviz.new
-    gv.graph do
+    Graph.graph do
       route :main => [:init, :parse, :cleanup, :printf]
       route :init => :make, :parse => :execute
       route :execute => [:make, :compare, :printf]
@@ -93,9 +94,9 @@ Modify some.
         node :init
         node :make
       end
+
+      save(:sample3, :png)
     end
-    
-    gv.save(:sample3, :png)
 
 This outputs below.
 
