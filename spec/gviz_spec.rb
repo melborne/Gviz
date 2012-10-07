@@ -1,241 +1,356 @@
 # encoding: UTF-8
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe Gviz do
-  before(:each) do
-    @g = Gviz.new
-  end
-
-  context "node" do
-    it "add a node" do
-      node = @g.node(:a)
-      node.should be_a_instance_of Gviz::Node
-      node.id.should eql :a
-      node.attrs.should be_empty
-      @g.nodeset.map(&:id).should eql [:a]
-    end
-
-    it "add nodes" do
-      @g.node(:a)
-      @g.node(:b)
-      @g.nodeset.map(&:id).should eql [:a, :b]
-    end
-
-    it "add a node with attrs" do
-      node = @g.node(:a, color:'blue', label:'hello')
-      node.should be_a_instance_of Gviz::Node
-      node.id.should eql :a
-      node.attrs.should == { color:'blue', label:'hello' }
-      @g.nodeset.map(&:attrs).should eql [node.attrs]
-    end
-
-    it "update node attrs" do
-      @g.node(:a, color:'red', label:'hello')
-      @g.node(:a, color:'blue', shape:'box')
-      @g.nodeset.first.attrs.should == { color:'blue', label:'hello', shape:'box' }
-    end
-
-    it "raise an error with a string" do
-      ->{ @g.node('a') }.should raise_error(ArgumentError)
-    end
-
-    it "raise an error with a symbol which include underscores" do
-      ->{ @g.node(:a_b) }.should raise_error(ArgumentError)
-    end
-  end
-
-  context "edge" do
-    it "add a edge" do
-      edge = @g.edge(:a_b)
-      edge.should be_a_instance_of Gviz::Edge
-      edge.st.should eql :a
-      edge.ed.should eql :b
-      edge.attrs.should be_empty
-      @g.edgeset.map(&:to_s).should eql ["a -> b"]
-    end
-
-    it "add a edge with attrs" do
-      edge = @g.edge(:a_b, color:'red', arrowhead:'none')
-      edge.should be_a_instance_of Gviz::Edge
-      edge.st.should eql :a
-      edge.ed.should eql :b
-      edge.attrs.should == { color:'red', arrowhead:'none' }
-      @g.edgeset.map(&:to_s).should eql ["a -> b"]
-    end
-
-    it "update edge attrs" do
-      @g.edge(:a_b, color:'blue', style:'bold')
-      @g.edge(:a_b, color:'red')
-      @g.edgeset.map(&:to_s).should eql ["a -> b"]
-      @g.edgeset.first.attrs.should == { color:'red', style:'bold' }
-    end
-
-    it "add different edges, but same name" do
-      edge1 = @g.edge(:a_b)
-      edge2 = @g.edge(:a_b_1)
-      edge1.seq.should eql 0
-      edge2.seq.should eql 1
-      @g.edgeset.map(&:to_s).should eql ["a -> b", "a -> b"]
-    end
-
-    it "can accept a string id" do
-      @g.edge('a_b')
-      @g.edgeset.first.to_s.should eql "a -> b"
-    end
-
-    it "can take ports with a string id" do
-      @g.edge("a:n_b:f")
-      edge = @g.edgeset.first
-      edge.st.should eql :a
-      edge.ed.should eql :b
-      edge.st_port.should eql :n
-      edge.ed_port.should eql :f
-      edge.to_s.should eql "a:n -> b:f"
+describe Gviz::Node do
+  describe ".new" do
+    context "when only a symbol passed" do
+      subject { Gviz::Node.new(:a) }
+      it { should be_a_instance_of Gviz::Node }
+      its(:id) { should be :a }
+      its(:attrs) { should be_empty }
     end
     
-    it "can take ports with a string id 2" do
-      @g.add(:a => :b)
-      @g.edge("a:n_b:f", color:'red')
-      @g.edgeset.map(&:id).should eql [:a_b]
-      
+    context "when only a string passed" do
+      subject { Gviz::Node.new('a') }
+      it { should be_a_instance_of Gviz::Node }
+      its(:id) { should eq 'a' }
+      its(:attrs) { should be_empty }
     end
 
-    it "raise an error with a node which include other than words or colon" do
-      ->{ @g.edge "b c" }.should raise_error(ArgumentError)
-      ->{ @g.edge "b/c" }.should raise_error(ArgumentError)
-      ->{ @g.edge "bc!" }.should raise_error(ArgumentError)
+    context "when a symbol and hash options passed" do
+      opts = { shape:'circle', style:'filled' }
+      subject { Gviz::Node.new(:a, opts) }
+      its(:id) { should be :a }
+      its(:attrs) { should eq opts }
+    end
+
+    context "when a symbol with underscore passed" do
+      it "raise an error" do
+        ->{ Gviz::Node.new(:a_b) }.should raise_error(ArgumentError)
+      end
     end
   end
 
-  context "add" do
+  describe "#to_s" do
+    subject { Gviz::Node.new(:a, style:'filled').to_s }
+    it { should eq "a" }
+  end
+end
+
+describe Gviz::Edge do
+  describe ".new" do
+    context "when a symbol with an underscore passed" do
+      subject { Gviz::Edge.new(:a_b) }
+      it { should be_a_instance_of Gviz::Edge }
+      its(:id) { should be :a_b }
+      its(:st) { should be :a }
+      its(:ed) { should be :b }
+      its(:seq) { should eq 0 }
+      its(:st_port) { should be_nil }
+      its(:ed_port) { should be_nil }
+      its(:to_s) { should eq "a -> b" }
+    end
+
+    context "when a string with an underscore passed" do
+      subject { Gviz::Edge.new('a_b') }
+      it { should be_a_instance_of Gviz::Edge }
+      its(:id) { should be :a_b }
+      its(:st) { should be :a }
+      its(:ed) { should be :b }
+      its(:seq) { should eq 0 }
+      its(:st_port) { should be_nil }
+      its(:ed_port) { should be_nil }
+      its(:to_s) { should eq "a -> b" }
+    end
+
+    context "when a symbol with two underscores passed" do
+      subject { Gviz::Edge.new('a_b_1') }
+      it { should be_a_instance_of Gviz::Edge }
+      its(:id) { should be :a_b_1 }
+      its(:st) { should be :a }
+      its(:ed) { should be :b }
+      its(:seq) { should eq 1 }
+      its(:st_port) { should be_nil }
+      its(:ed_port) { should be_nil }
+      its(:to_s) { should eq "a -> b" }
+    end
+
+    context "when a string with a colon passed" do
+      subject { Gviz::Edge.new('a:x_b:y') }
+      it { should be_a_instance_of Gviz::Edge }
+      its(:id) { should be :a_b }
+      its(:st) { should be :a }
+      its(:ed) { should be :b }
+      its(:seq) { should eq 0 }
+      its(:st_port) { should be :x }
+      its(:ed_port) { should be :y }
+      its(:to_s) { should eq "a:x -> b:y" }
+    end
+
+    context "when a symbol and hash options passed" do
+      opts = { style:'bold', color:'red' }
+      subject { Gviz::Edge.new(:a_b, opts) }
+      its(:id) { should be :a_b }
+      its(:attrs) { should eq opts }
+    end
+
+    context "when a string with other than words or colon passed" do
+      it "raise an error" do
+        ->{ Gviz::Edge.new('a!b_c') }.should raise_error(ArgumentError)
+      end
+    end
+  end
+end
+
+describe Gviz do
+  let(:gv) { Gviz.new }
+
+  describe "#node" do
+    context "define a node" do
+      before { gv.node(:a) }
+      subject { gv.nodeset }
+      its(:size) { should eql 1}
+      its(:first) { should be_a_instance_of Gviz::Node }
+    end
+
+    context "define several nodes" do
+      before do
+        gv.node(:a)
+        gv.node(:b)
+      end
+      subject { gv.nodeset }
+      its(:size) { should eql 2 }
+    end
+
+    context "define a node with attrs" do
+      subject { gv.node(:a, color:'blue', label:'hello') }
+      its(:id) { should eql :a }
+      its(:attrs) { should be { color:'blue', label:'hello' } }
+    end
+
+    context "update node attrs" do
+      before do
+        gv.node(:a, color:'red', label:'hello')
+        gv.node(:a, color:'blue', shape:'box')
+      end
+      subject { gv.nodeset.first.attrs }
+      it { should be { color:'blue', label:'hello', shape:'box' } }
+    end
+
+    context "when pass a string" do
+      it "raise an error" do
+        ->{ gv.node('a') }.should raise_error(ArgumentError)
+      end
+    end
+
+    context "when pass a symbol with an underscore" do
+      it "raise an error" do
+        ->{ gv.node(:a_b) }.should raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe "#edge" do
+    context "define a edge" do
+      before { gv.edge(:a_b) }
+      subject { gv.edgeset }
+      its(:size) { should eql 1}
+      its(:first) { should be_a_instance_of Gviz::Edge }
+    end
+
+    context "update edge attrs" do
+      before do
+        gv.edge(:a_b, color:'blue', style:'bold')
+        gv.edge(:a_b, color:'red')
+      end
+      subject { gv.edgeset.first }
+      its(:attrs) { should be { color:'red', style:'bold'} }
+    end
+
+    context "define different edges with same name" do
+      before do
+        gv.edge(:a_b)
+        gv.edge(:a_b_1)
+      end
+      subject { gv.edgeset }
+      its(:size) { should eql 2 }
+    end
+  end
+
+  describe "#add" do
     context "edges" do
-      it "one to many" do
-        @g.add :a => [:b, :c, :d]
-        @g.edgeset.map(&:to_s).should eql ['a -> b', 'a -> c', 'a -> d']
-        @g.nodeset.map(&:id).should eql [:a, :b, :c, :d]
+      context "one to many" do
+        before { gv.add :a => [:b, :c, :d] }
+        subject { gv.edgeset }
+        its(:size) { should eq 3 }
+        describe "nodes" do
+          subject { gv.nodeset }
+          its(:size) { should eq 4 }
+        end
       end
 
-      it "many to many" do
-        @g.add [:main, :sub] => [:a, :b, :c]
-        @g.edgeset.map(&:to_s)
-            .should eql ['main -> a', 'main -> b', 'main -> c',
-                         'sub -> a',  'sub -> b',  'sub -> c']
-        @g.nodeset.map(&:id).should eql [:main, :a, :b, :c, :sub]
+      context "many to many" do
+        before { gv.add [:main, :sub] => [:a, :b, :c] }
+        subject { gv.edgeset }
+        its(:size) { should eq 6 }
+        describe "nodes" do
+          subject { gv.nodeset }
+          its(:size) { should eq 5 }
+        end
       end
 
-      it "sequence" do
-        @g.add :main => :sub, :sub => [:a, :b]
-        @g.edgeset.map(&:to_s)
-            .should eql ['main -> sub', 'sub -> a', 'sub -> b']
-        @g.nodeset.map(&:id).should eql [:main, :sub, :a, :b]
+      context "pass two routes" do
+        before { gv.add :main => :sub, :sub => [:a, :b] }
+        subject { gv.edgeset }
+        its(:size) { should eq 3 }
+        describe "nodes" do
+          subject { gv.nodeset }
+          its(:size) { should eq 4 }
+        end
       end
 
-      it "several sequences" do
-        @g.add :main => :a, :a => [:c, :d]
-        @g.add :main => :b, :b => [:e, :f]
-        @g.edgeset.map(&:to_s)
-            .should eql ['main -> a', 'a -> c', 'a -> d',
-                         'main -> b', 'b -> e', 'b -> f']
-        @g.nodeset.map(&:id).should eql [:main, :a, :c, :d, :b, :e, :f]
+      context "when call twice" do
+        before do
+          gv.add :main => :a, :a => [:c, :d]
+          gv.add :main => :b, :b => [:e, :f]
+        end
+        subject { gv.edgeset }
+        its(:size) { should eq 6 }
+        describe "nodes" do
+          subject { gv.nodeset }
+          its(:size) { should eq 7 }
+        end
       end
     end
 
     context "nodes" do
-      it "add a node" do
-        @g.add :a
-        @g.nodeset.map(&:id).should eql [:a]
+      context "one" do
+        before { gv.add :a }
+        subject { gv.nodeset }
+        its(:size) { should eql 1 }
       end
 
-      it "add several nodes" do
-        @g.add :a, :b, :c
-        @g.nodeset.map(&:id).should eql [:a, :b, :c]
+      context "several" do
+        before { gv.add :a, :b, :c }
+        subject { gv.nodeset }
+        its(:size) { should eql 3 }
       end
 
-      it "raise error with a string" do
-        ->{ @g.add 'a' }.should raise_error(ArgumentError)
+      context "pass a string" do
+        it "raise an error" do
+          ->{ gv.add 'a' }.should raise_error(ArgumentError)
+        end
       end
     end
   end
 
-  context "graph" do
-    it "add routes" do
-      @g.graph do
-        add :main => [:a, :b, :c]
-        add :a => [:d, :e]
+  describe "#graph" do
+    context "when add routes" do
+      before do
+        gv.graph do
+          add :main => [:a, :b, :c]
+          add :a => [:d, :e]
+        end
       end
-      @g.edgeset.map(&:to_s)
-          .should eql ['main -> a', 'main -> b', 'main -> c',
-                       'a -> d', 'a -> e']
-      @g.nodeset.map(&:id).should eql [:main, :a, :b, :c, :d, :e]
+      subject { gv.edgeset }
+      its(:size) { should eq 5 }
     end
   end
 
-  context "subgraph" do
-    it "add subgraph" do
-      sub = @g.subgraph do
-        add :main => [:a, :b]
+  describe "#subgraph" do
+    context "when add one" do
+      before do
+        gv.subgraph { add :main => [:a, :b] }
       end
-      @g.subgraphs.should eql [sub]
+      subject { gv.subgraphs }
+      its(:size) { should eq 1 }
     end
 
-    it "raise error when name is not start with 'cluster'" do
-      ->{ @g.subgraph(:clu) {} }.should raise_error
+    context "when add one" do
+      before do
+        gv.subgraph { add :main => [:a, :b] }
+        gv.subgraph { add :main => [:a, :b] }
+      end
+      subject { gv.subgraphs }
+      its(:size) { should eq 2 }
+    end
+
+    context "it has a name other than `cluster**`" do
+      it "raise an error" do
+        ->{ gv.subgraph(:clu) {} }.should raise_error
+      end
     end
   end
 
-  context "nodes" do
-    it "set nodes attributes globally" do
-      attr = { style:"filled", color:"purple" }
-      @g.nodes(attr)
-      @g.gnode_attrs.should == attr
+  describe "#nodes" do
+    context "set node attributes" do
+      opts = { style:"filled", color:"purple" }
+      before { gv.nodes(opts) }
+      subject { gv.gnode_attrs }
+      it { should eql opts }
     end
     
-    it "add nodes attributes globally" do
-      attr = { style:"filled", color:"purple" }
-      attr2 = { color:"red", shape:"box" }
-      @g.nodes(attr)
-      @g.nodes(attr2)
-      @g.gnode_attrs.should == { style:"filled", color:"red", shape:"box" }
+    context "update node attributes" do
+      opts1 = { style:"filled", color:"purple" }
+      opts2 = { color:"red", shape:"box" }
+      before do
+        gv.nodes(opts1)
+        gv.nodes(opts2)
+      end
+      subject { gv.gnode_attrs }
+      it { should be { style:"filled", color:"red", shape:"box" } }
     end
   end
 
-  context "edges" do
-    it "set edges attributes globally" do
-      attr = { style:"dotted", color:"purple" }
-      @g.edges(attr)
-      @g.gedge_attrs.should == attr
+  describe "#edges" do
+    context "set edge attributes" do
+      opts = { style:"dotted", color:"purple" }
+      before { gv.edges(opts) }
+      subject { gv.gedge_attrs }
+      it { should eq opts }
     end
 
-    it "add edges attributes globally" do
-      attr = { style:"dotted", color:"purple" }
-      attr2 = { color:"red", arrowhead:"none" }
-      @g.edges(attr)
-      @g.edges(attr2)
-      @g.gedge_attrs.should == { style:"dotted", color:"red", arrowhead:"none" }
-    end
-  end
-
-  context "global" do
-    it "set global graph attributes" do
-      attrs = { label:"A simple graph", rankdir:"LR" }
-      @g.global(attrs)
-      @g.graph_attrs.should == attrs
+    context "update edge attributes" do
+      opts = { style:"dotted", color:"purple" }
+      opts2 = { color:"red", arrowhead:"none" }
+      before do
+        gv.edges(opts)
+        gv.edges(opts2)
+      end
+      subject { gv.gedge_attrs }
+      it { should be { style:"dotted", color:"red", arrowhead:"none" } }
     end
   end
 
-  context "rank" do
-    it "let nodes be same rank" do
-      @g.route(:a => [:b, :c], :b => [:d, :e])
-      @g.rank(:same, :b, :d, :e)
-      @g.ranks.first.should eql [:same, [:b, :d, :e]]
+  describe "#global" do
+    context "set graph attributes" do
+      opts = { label:"A simple graph", rankdir:"LR" }
+      before { gv.global(opts) }
+      subject { gv.graph_attrs }
+      it { should eq opts }
     end
   end
 
-  context "to_s(output dot data)" do
-    it "without attrs" do
-      @g.add :main => [:init, :parse]
-      @g.add :init => :printf
-      @g.to_s.should eql ~<<-EOS
+  describe "#rank" do
+    context "set same" do
+      before do
+        gv.route(:a => [:b, :c], :b => [:d, :e])
+        gv.rank(:same, :b, :d, :e)
+      end
+      subject { gv.ranks.first }
+      it { should eq [:same, [:b, :d, :e]] }
+    end
+  end
+
+  describe "#to_s" do
+    context "without attrs" do
+      before do
+        gv.add :main => [:init, :parse]
+        gv.add :init => :printf
+      end
+      subject { gv.to_s }
+      it do
+        should eq ~<<-EOS
           digraph G {
             main;
             init;
@@ -246,166 +361,221 @@ describe Gviz do
             init -> printf;
           }
           EOS
+      end
     end
 
-    it "with node attrs" do
-      @g.add :a => :b
-      @g.node(:a, color:'red', style:'filled')
-      @g.to_s.should eql ~<<-EOS
+    context "with node attrs" do
+      before do
+        gv.add :a => :b
+        gv.node(:a, color:'red', style:'filled')
+      end
+      subject { gv.to_s }
+      it do
+        should eq ~<<-EOS
           digraph G {
             a[color="red",style="filled"];
             b;
             a -> b;
           }
           EOS
+      end
     end
 
-    it "with edge attrs" do
-      @g.edge(:a_b, color:'red')
-      @g.to_s.should eql ~<<-EOS
+    context "with edge attrs" do
+      before do
+        gv.edge(:a_b, color:'red')
+      end
+      subject { gv.to_s }
+      it do
+        should eq ~<<-EOS
           digraph G {
             a;
             b;
             a -> b[color="red"];
           }
           EOS
+      end
     end
 
-    it "with 2 edges with different attrs" do
-      @g.edge(:a_b, color:'red')
-      @g.edge(:a_b_1, color:'blue')
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a;
-          b;
-          a -> b[color="red"];
-          a -> b[color="blue"];
-        }
-        EOS
+    context "with 2 edges with different attrs" do
+      before do
+        gv.edge(:a_b, color:'red')
+        gv.edge(:a_b_1, color:'blue')
+      end
+      subject { gv.to_s }
+      it do
+        should eq ~<<-EOS
+          digraph G {
+            a;
+            b;
+            a -> b[color="red"];
+            a -> b[color="blue"];
+          }
+          EOS
+      end
     end
 
-    it "with global node attributes" do
-      @g.nodes(shape:'box', style:'filled')
-      @g.add(:a => :b)
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          node[shape="box",style="filled"];
-          a;
-          b;
-          a -> b;
-        }
-        EOS
+    context "with global node attributes" do
+      before do
+        gv.nodes(shape:'box', style:'filled')
+        gv.add(:a => :b)
+      end
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            node[shape="box",style="filled"];
+            a;
+            b;
+            a -> b;
+          }
+          EOS
+      end
     end
 
-    it "with global edges attributes" do
-      @g.edges(style:'dotted', color:'red')
-      @g.add(:a => :b)
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          edge[style="dotted",color="red"];
-          a;
-          b;
-          a -> b;
-        }
-        EOS
+    context "with global edge attributes" do
+      before do
+        gv.edges(style:'dotted', color:'red')
+        gv.add(:a => :b)
+      end
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            edge[style="dotted",color="red"];
+            a;
+            b;
+            a -> b;
+          }
+          EOS
+      end
     end
 
-    it "with global attributes" do
-      @g.global(label:"A Simple Graph", rankdir:"LR")
-      @g.add(:a => :b)
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          label="A Simple Graph";
-          rankdir="LR";
-          a;
-          b;
-          a -> b;
-        }
-        EOS
+    context "with graph attributes" do
+      before do
+        gv.global(label:"A Simple Graph", rankdir:"LR")
+        gv.add(:a => :b)
+      end
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            label="A Simple Graph";
+            rankdir="LR";
+            a;
+            b;
+            a -> b;
+          }
+          EOS
+      end
     end
 
-    it "handle newline in a label nicely" do
-      @g.node(:a, label:"hello\nworld")
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a[label="hello\\nworld"];
-        }
-        EOS
+    context "when a label include `\\n`" do
+      before { gv.node(:a, label:"hello\nworld") }
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a[label="hello\\nworld"];
+          }
+          EOS
+      end
     end
 
-    it "can handle unicode labels" do
-      @g.node(:a, label:"こんにちは、世界！")
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a[label="こんにちは、世界！"];
-        }
-        EOS
+    context "when a label include unicode" do
+      before { gv.node(:a, label:"こんにちは、世界！") }
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a[label="こんにちは、世界！"];
+          }
+          EOS
+      end
     end
     
-    it "take port on edges" do
-      @g.route(:a => [:b, :c])
-      @g.edge("a:n_c:f")
-      @g.node(:a, label:"<n> a | b |<p> c")
-      @g.node(:c, label:"<o> d | e |<f> f")
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a[label="<n> a | b |<p> c"];
-          b;
-          c[label="<o> d | e |<f> f"];
-          a -> b;
-          a:n -> c:f;
-        }
-        EOS
+    context "take ports on edges" do
+      before do
+        gv.route(:a => [:b, :c])
+        gv.edge("a:n_c:f")
+        gv.node(:a, label:"<n> a | b |<p> c")
+        gv.node(:c, label:"<o> d | e |<f> f")
+      end
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a[label="<n> a | b |<p> c"];
+            b;
+            c[label="<o> d | e |<f> f"];
+            a -> b;
+            a:n -> c:f;
+          }
+          EOS
+      end
     end
 
-    it "with subgraph" do
-      @g.route(:a => :b)
-      @g.subgraph do
-        route :c => :d
+    context "with subgraph" do
+      before do
+        gv.route(:a => :b)
+        gv.subgraph { route :c => :d }
       end
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a;
-          b;
-          a -> b;
-          subgraph cluster0 {
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a;
+            b;
+            a -> b;
+            subgraph cluster0 {
+              c;
+              d;
+              c -> d;
+            }
+          }
+          EOS
+      end
+    end
+
+    context "with ranks" do
+      before do
+        gv.route(:a => [:b, :c], :b => [:d, :e])
+        gv.rank(:same, :b, :d, :e)
+        gv.rank(:min, :c)
+      end
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a;
+            b;
             c;
             d;
-            c -> d;
+            e;
+            a -> b;
+            a -> c;
+            b -> d;
+            b -> e;
+            { rank=same; b; d; e; }
+            { rank=min; c; }
           }
-        }
-        EOS
-    end
-
-    it "with ranks" do
-      @g.route(:a => [:b, :c], :b => [:d, :e])
-      @g.rank(:same, :b, :d, :e)
-      @g.rank(:min, :c)
-      @g.to_s.should eql ~<<-EOS
-        digraph G {
-          a;
-          b;
-          c;
-          d;
-          e;
-          a -> b;
-          a -> c;
-          b -> d;
-          b -> e;
-          { rank=same; b; d; e; }
-          { rank=min; c; }
-        }
-        EOS
+          EOS
+      end
     end
   end
+end
 
-  context "Graph class method" do
-    it "create a gviz object" do
-      g = Graph(:X) do
+describe '#Graph' do
+  context "build a shortcut of Gviz.new.graph" do
+    before do
+      @gv = Graph(:X) do
         add :a => [:b, :c]
       end
-      g.should be_a_instance_of Gviz
-      g.to_s.should eql ~<<-EOS
+    end
+    subject { @gv }
+    it { should be_a_instance_of Gviz }
+    its(:to_s) do
+      should eql ~<<-EOS
         digraph X {
           a;
           b;
