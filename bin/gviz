@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require "gviz"
+
+def graph_eval(gfile)
+  Graph { instance_eval ::File.read(gfile) }
+rescue Errno::ENOENT
+  abort "graph file `#{gfile}` not found"
+end
+
+graph_eval(ARGV[0] || "graph.ru")
+

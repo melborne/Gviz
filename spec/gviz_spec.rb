@@ -587,3 +587,25 @@ describe '#Graph' do
     end
   end
 end
+
+ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+
+describe "gviz command" do
+  context "when a graph file exist" do
+    subject { stdout = Open3.popen3("#{ROOT}/bin/gviz spec/graph.ru")[1].read }
+    it do
+      should eql ~<<-EOS
+        digraph G {
+          a;
+          b;
+          a -> b;
+        }
+        EOS
+    end
+  end
+
+  context "when a graph file not exist" do
+    subject { stderr = Open3.popen3("#{ROOT}/bin/gviz")[2].read }
+    it { should eql "graph file `graph.ru` not found\n" }
+  end
+end
