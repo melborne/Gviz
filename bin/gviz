@@ -11,7 +11,7 @@ end
 opts = Trollop::options do
   version "Gviz #{Gviz::VERSION} (c) 2012 kyoendo"
   banner <<-EOS
-Gviz is a tool for generating graphviz dot data with simple Ruby's syntax. It works with a graph spec file in which a graph spec describes with several gviz commands. If 'graph.ru' file exist on that directory, it will be loaded as a graph spec file automatically.
+Gviz is a tool for generating graphviz dot data with simple Ruby's syntax. It works with a graph spec file in which a graph spec describes with several gviz commands. If 'graph.ru' file exist on a directory of the execution, it will be automatically loaded as a graph spec file.
 
 Example of graph.ru:
 

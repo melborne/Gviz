@@ -105,6 +105,28 @@ This outputs below.
 
 Another examples are at `examples` directory
 
+## gviz command
+It comes with a `gviz` command. This works with a graph spec file. If 'graph.ru' file exist on a directory of the execution, it will be automatically loaded as a graph spec file.
+
+Example of graph.ru:
+
+      route :main => [:init, :parse, :cleanup, :printf]
+      route :init => :make, :parse => :execute
+      route :execute => [:make, :compare, :printf]
+
+      save(:sample, :png)
+
+Usage:
+
+      gviz [options] <graph filename>
+
+where [options] are:
+
+    --name,   -n :   Graph name (default: G)
+    --type,   -t :   Graph type (default: digraph)
+    --version, -v:   Print version and exit
+    --help,    -h:   Show this message
+
 ## Contributing
 
 1. Fork it
