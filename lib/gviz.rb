@@ -1,4 +1,5 @@
 require_relative "gviz/system_extension"
+require_relative "gviz/version"
 
 class Gviz
   class Node < Struct.new(:id, :attrs)
