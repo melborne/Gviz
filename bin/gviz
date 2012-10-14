@@ -1,11 +1,36 @@
 #!/usr/bin/env ruby
 require "gviz"
+require "trollop"
 
-def graph_eval(gfile)
-  Graph { instance_eval ::File.read(gfile) }
+def gfile_eval(gfile, opts)
+  Graph(opts[:name], opts[:type]) { instance_eval ::File.read(gfile) }
 rescue Errno::ENOENT
   abort "graph file `#{gfile}` not found"
 end
 
-graph_eval(ARGV[0] || "graph.ru")
+opts = Trollop::options do
+  version "Gviz #{Gviz::VERSION} (c) 2012 kyoendo"
+  banner <<-EOS
+Gviz is a tool for generating graphviz dot data with simple Ruby's syntax. It works with a graph spec file in which a graph spec describes with several gviz commands. If 'graph.ru' file exist on that directory, it will be loaded as a graph spec file automatically.
 
+Example of graph.ru:
+
+      route :main => [:init, :parse, :cleanup, :printf]
+      route :init => :make, :parse => :execute
+      route :execute => [:make, :compare, :printf]
+
+      save(:sample, :png)
+
+Usage:
+
+      gviz [options] <graph filename>
+
+where [options] are:
+EOS
+
+  opt :name, "Graph name", :default => 'G'
+  opt :type, "Graph type", :default => 'digraph'
+end
+
+gfile = ARGV[0] || "graph.ru"
+gfile_eval(gfile, opts)
