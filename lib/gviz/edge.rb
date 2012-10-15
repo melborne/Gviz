@@ -1,7 +1,7 @@
 class Gviz::Edge < Struct.new(:id, :attrs)
   attr_reader :st, :ed, :seq, :st_port, :ed_port
   def initialize(id, attrs={})
-    raise ArgumentError, "`attrs` must a hash" unless attrs.is_a?(Hash)
+    raise ArgumentError, "edge `attrs` must a hash" unless attrs.is_a?(Hash)
     id, @st, @ed, @seq, @st_port, @ed_port = parse_id(id)
     super(id, attrs)
   end
@@ -18,7 +18,7 @@ class Gviz::Edge < Struct.new(:id, :attrs)
 
   private
   def parse_id(id)
-    raise ArgumentError, "id must not include other than words or a colon" if id.match(/[^\w:]/)
+    raise ArgumentError, "edge `id` must not include other than ASCII words, colon or minus" if id.match(/[^\w:-]/)
     st, ed, seq = "#{id}".split('_')
     st, st_port = st.split(':').map(&:intern)
     ed, ed_port = ed.split(':').map(&:intern)

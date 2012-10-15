@@ -20,7 +20,7 @@ class Gviz
   end
 
   def node(id, attrs={})
-    raise ArgumentError, '`id` must a symbol' unless id.is_a?(Symbol)
+    raise ArgumentError, 'node `id` must a symbol' unless id.is_a?(Symbol)
     Node[id, attrs].tap do |node|
       if exist = @nodes[node.id]
         exist.attrs.update(node.attrs)
@@ -32,7 +32,7 @@ class Gviz
 
   def edge(id, attrs={})
     unless id.match(/._./)
-      raise ArgumentError, '`id` must a symbol in which node names joined with "_"'
+      raise ArgumentError, 'edge `id` must a symbol in which node names joined with "_"'
     end
     Edge[id.intern, attrs].tap do |edge|
       if exist = @edges[id.intern]
