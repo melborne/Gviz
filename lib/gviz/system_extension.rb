@@ -4,3 +4,9 @@ class Numeric
     unit * (tgr.max - tgr.min) + tgr.min
   end
 end
+
+class Object
+  def to_id
+    to_s.hash.to_s.intern
+  end
+end

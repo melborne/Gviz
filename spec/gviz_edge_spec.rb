@@ -58,9 +58,29 @@ describe Gviz::Edge do
       its(:attrs) { should eq opts }
     end
 
+    context "when a number string passed" do
+      subject { Gviz::Edge.new('1234_1235') }
+      its(:id) { should be :'1234_1235' }
+      its(:st) { should be :'1234' }
+      its(:ed) { should be :'1235' }
+    end
+
+    context "when a string with minus sign" do
+      subject { Gviz::Edge.new('-123_124') }
+      its(:id) { should be :'-123_124' }
+      its(:st) { should be :'-123' }
+      its(:ed) { should be :'124' }
+    end
+
     context "when a string with other than words or colon passed" do
       it "raise an error" do
         ->{ Gviz::Edge.new('a!b_c') }.should raise_error(ArgumentError)
+      end
+    end
+
+    context "when a symbol without underscore passed" do
+      it "raise an error" do
+        ->{ Gviz::Edge.new(:abc) }.should raise_error(ArgumentError)
       end
     end
   end

@@ -31,9 +31,6 @@ class Gviz
   end
 
   def edge(id, attrs={})
-    unless id.match(/._./)
-      raise ArgumentError, 'edge `id` must a symbol in which node names joined with "_"'
-    end
     Edge[id.intern, attrs].tap do |edge|
       if exist = @edges[id.intern]
         exist.attrs.update(edge.attrs)

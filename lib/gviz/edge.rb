@@ -18,7 +18,12 @@ class Gviz::Edge < Struct.new(:id, :attrs)
 
   private
   def parse_id(id)
-    raise ArgumentError, "edge `id` must not include other than ASCII words, colon or minus" if id.match(/[^\w:-]/)
+    unless id.match(/._./)
+      raise ArgumentError, 'edge `id` must a symbol in which node names joined with "_"'
+    end
+    if id.match(/[^\d\w:-]/)
+      raise ArgumentError, "edge `id` must not include other than ASCII words, colon or minus"
+    end
     st, ed, seq = "#{id}".split('_')
     st, st_port = st.split(':').map(&:intern)
     ed, ed_port = ed.split(':').map(&:intern)
