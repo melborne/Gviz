@@ -47,7 +47,7 @@ class Gviz
   # When `id` includes '*'(asterisk), multiple edges are updated.
   #
   #   add(:a => [:b, :c])
-  #   edge(:a_*, arrowhead:'none')
+  #   edge('a_*', arrowhead:'none')
   #
   # is equivalent to:
   #
