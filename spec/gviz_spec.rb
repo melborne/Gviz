@@ -36,6 +36,17 @@ describe Gviz do
       it { should be { color:'blue', label:'hello', shape:'box' } }
     end
 
+    context "update node attrs which node is created by add method" do
+      before do
+        name = 'hello'
+        gv.add(:a => name.to_id)
+        gv.node(name.to_id, color:'red')
+        gv.nodeset.map(&:id)
+      end
+      subject { gv.nodeset.map(&:attrs) }
+      it { should eql [{}, {color:'red'}] }
+    end
+
     context "when pass a string" do
       it "raise an error" do
         ->{ gv.node('a') }.should raise_error(ArgumentError)
@@ -89,7 +100,6 @@ describe Gviz do
         gv.add(:main => [:a, :b], :main2 => :sub)
         gv.add(:main => :sub)
         gv.edge('*_main', color:'red')
-        p gv.edgeset
       end
       subject { gv.edgeset.map(&:attrs) }
       it { should eql [{color:'red'}, {color:'red'}, {}, {color:'red'}] }

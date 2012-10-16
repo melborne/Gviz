@@ -27,7 +27,7 @@ class Gviz::Edge < Struct.new(:id, :attrs)
     st, ed, seq = "#{id}".split('_')
     st, st_port = st.split(':').map(&:intern)
     ed, ed_port = ed.split(':').map(&:intern)
-    id = (seq ? [st, ed, seq] : [st, ed]).join('_').intern
+    id = seq ? :"#{st}_#{ed}_#{seq}" : :"#{st}_#{ed}"
     [id, st, ed, seq.to_i, st_port, ed_port]
   end
 end

@@ -27,7 +27,6 @@ class Gviz
   #   node(:a, color:'red', shape:'circle')
   #
   def node(id, attrs={})
-    raise ArgumentError, 'node `id` must a symbol' unless id.is_a?(Symbol)
     Node[id, attrs].tap do |node|
       if exist = @nodes[node.id]
         exist.attrs.update(node.attrs)
@@ -59,7 +58,7 @@ class Gviz
       return multiple_edge(md, attrs)
     end
 
-    Edge[id.intern, attrs].tap do |edge|
+    Edge[id, attrs].tap do |edge|
       if exist = @edges[id.intern]
         exist.attrs.update(edge.attrs)
       else
@@ -143,7 +142,7 @@ class Gviz
       when Hash
         unit.each do |sts, eds|
           Array(sts).product(Array(eds))
-                    .each { |st, ed| edge([st,ed].join('_').intern) }
+                    .each { |st, ed| edge "#{st}_#{ed}" }
         end
       when Symbol
         node(unit)
@@ -230,7 +229,7 @@ class Gviz
 
   def multiple_edge(md, attrs)
     st = [md.pre_match, md.post_match].detect { |e| !e.empty? }.delete('_')
-    edges = edgeset.select { |edge| [edge.st, edge.ed].include? st.intern }
+    edges = edgeset.select { |edge| edge.nodes.include? st.intern }
     edges.each { |eg| edge eg.id, attrs }
   end
 end

@@ -10,13 +10,6 @@ describe Gviz::Node do
       its(:attrs) { should be_empty }
     end
     
-    context "when only a string passed" do
-      subject { Gviz::Node.new('a') }
-      it { should be_a_instance_of Gviz::Node }
-      its(:id) { should eq 'a' }
-      its(:attrs) { should be_empty }
-    end
-
     context "when a symbol and hash options passed" do
       opts = { shape:'circle', style:'filled' }
       subject { Gviz::Node.new(:a, opts) }
@@ -27,6 +20,12 @@ describe Gviz::Node do
     context "when a symbol with underscore passed" do
       it "raise an error" do
         ->{ Gviz::Node.new(:a_b) }.should raise_error(ArgumentError)
+      end
+    end
+
+    context "when a string passed" do
+      it "raise an error" do
+        ->{ Gviz::Node.new('a') }.should raise_error(ArgumentError)
       end
     end
   end
