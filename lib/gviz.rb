@@ -2,6 +2,7 @@
 class Gviz
 end
 
+# +Graph+ fuction is a shortcut method of `Gviz#graph`.
 def Graph(name=:G, type=:digraph, &blk)
   Gviz.new(name, type).graph(&blk)
 end

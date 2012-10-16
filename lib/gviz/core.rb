@@ -11,14 +11,21 @@ class Gviz
     @ranks = []
   end
   
+  # Access to all defined node objects.
   def nodeset
     @nodes.values
   end
 
+  # Access to all defined edge objects.
   def edgeset
     @edges.values
   end
 
+  # Define a node or update a node attributes.
+  # The first argument is `id` of the node which must a symbol form.
+  #
+  #   node(:a, color:'red', shape:'circle')
+  #
   def node(id, attrs={})
     raise ArgumentError, 'node `id` must a symbol' unless id.is_a?(Symbol)
     Node[id, attrs].tap do |node|
@@ -30,6 +37,23 @@ class Gviz
     end
   end
 
+  # Difine a edge or update a edge attributes.
+  # The first argument is `id` of the edge, which is a symbol or string constructed
+  # from two nodes joined with '_'(underscore).
+  #
+  #   edge(:a_b, color:'red')
+  #
+  # The corresponding nodes will be defined if these are not exist.
+  #
+  # When `id` includes '*'(asterisk), multiple edges are updated.
+  #
+  #   add(:a => [:b, :c])
+  #   edge(:a_*, arrowhead:'none')
+  #
+  # is equivalent to:
+  #
+  #   edge(:a_b, arrowhead:'none')
+  #   edge(:a_c, arrowhead:'none')
   def edge(id, attrs={})
     if md = id.match(/\*/)
       return multiple_edge(md, attrs)
@@ -45,18 +69,28 @@ class Gviz
     end
   end
 
+  # Define all nodes attributes.
   def nodes(attrs)
     @gnode_attrs.update(attrs)
   end
 
+  # Define all edges attributes.
   def edges(attrs)
     @gedge_attrs.update(attrs)
   end
 
+  # Define graph global attributes.
   def global(attrs)
     @graph_attrs.update(attrs)
   end
 
+  # Define subgraph.
+  #
+  #   subgraph do
+  #     global label:sub1
+  #     add :a => :b
+  #   end
+  #
   def subgraph(&blk)
     Gviz.new("cluster#{subgraphs.size}", :subgraph).tap do |graph|
       subgraphs << graph
@@ -64,11 +98,45 @@ class Gviz
     end
   end
   
+  # +graph+ is a shorcut method.
+  #
+  #   gv = Gviz.new
+  #   gv.graph do
+  #     add :a => :b
+  #     node :a, color:'red'
+  #   end
+  #
+  # is equivalent to:
+  #
+  #   gv = Gviz.new
+  #   gv.add :a => :b
+  #   gv.node :a, color:'red'
+  #
   def graph(&blk)
     instance_eval(&blk)
     self
   end
 
+  # Define nodes or routes(node-edge combinaitons).
+  # When an argument is a symbol, a node is defined.
+  #
+  #   add :a, :b
+  #
+  # is equivalent to:
+  #
+  #   node :a
+  #   node :b
+  #
+  # When an argument is a hash, edges are defined.
+  #
+  #   add :a => [:b, :c], :c => :d
+  #
+  # is equivalent to:
+  #
+  #   edge :a_b
+  #   edge :a_c
+  #   edge :c_d
+  #
   def add(*nodes_or_routes)
     nodes_or_routes.each do |unit|
       case unit
@@ -87,6 +155,11 @@ class Gviz
   end
   alias :route :add
 
+  # Define a rank to nodes.
+  # :same, :min, :max, :source and :sink are acceptable types.
+  #
+  #   rank(:same, :a, :b)
+  #
   def rank(type, *nodes)
     types = [:same, :min, :max, :source, :sink]
     unless types.include?(type)
@@ -134,6 +207,8 @@ class Gviz
     result.join("\n")
   end
 
+  # Create a graphviz dot file. When an image type is specified,
+  # the image is also created.
   def save(path, type=nil)
     File.open("#{path}.dot", "w") { |f| f.puts self }
     system "dot -T#{type} #{path}.dot -o #{path}.#{type}" if type
