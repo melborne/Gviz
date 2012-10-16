@@ -74,6 +74,26 @@ describe Gviz do
       subject { gv.edgeset }
       its(:size) { should eql 2 }
     end
+
+    context "when a string with *(asterisk) passed" do
+      before do
+        gv.add(:a => [:b, :c], :c => :d)
+        gv.edge('a_*', color:'red')
+      end
+      subject { gv.edgeset.map(&:attrs) }
+      it { should eql [{ color:'red' }, { color:'red' }, {}] }
+    end
+
+    context "when a string with *(asterisk) passed 2" do
+      before do
+        gv.add(:main => [:a, :b], :main2 => :sub)
+        gv.add(:main => :sub)
+        gv.edge('*_main', color:'red')
+        p gv.edgeset
+      end
+      subject { gv.edgeset.map(&:attrs) }
+      it { should eql [{color:'red'}, {color:'red'}, {}, {color:'red'}] }
+    end
   end
 
   describe "#add" do
