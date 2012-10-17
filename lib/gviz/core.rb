@@ -55,7 +55,7 @@ class Gviz
   #   edge(:a_c, arrowhead:'none')
   def edge(id, attrs={})
     if md = id.match(/\*/)
-      return multiple_edge(md, attrs)
+      return multi_edge(md, attrs)
     end
 
     Edge[id, attrs].tap do |edge|
@@ -227,8 +227,8 @@ class Gviz
     join ? '[' + arr.join(',') + ']' : arr
   end
 
-  def multiple_edge(md, attrs)
-    st = [md.pre_match, md.post_match].detect { |e| !e.empty? }.delete('_')
+  def multi_edge(md, attrs)
+    st = (md.pre_match + md.post_match).delete('_')
     edges = edgeset.select { |edge| edge.nodes.include? st.intern }
     edges.each { |eg| edge eg.id, attrs }
   end
