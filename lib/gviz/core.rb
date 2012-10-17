@@ -53,6 +53,24 @@ class Gviz
   #
   #   edge(:a_b, arrowhead:'none')
   #   edge(:a_c, arrowhead:'none')
+  #
+  # You can draw two or more edges between a pair of nodes,
+  # by adding a identifier with a underscore after the edge id.
+  #
+  #   gv.edge(:a_b)
+  #   gv.edge(:a_b_1)
+  #
+  # This create two nodes between a, b nodes.
+  #
+  # You can define a endpoint to a node, by adding a point identifier
+  # with a colon after the each node. You must specify the identifiers
+  # it the label of the corresponding nodes.
+  #
+  #   gv.edge("a:x_b:y")
+  #   gv.node(:a, label:"<x> 1 | 2 | 3")
+  #   gv.node(:b, label:"4 | 5 |<y> 6")
+  #
+  # The edge 'a-b' joins 1 of the node 'a' with 6 of the node 'b'.
   def edge(id, attrs={})
     if md = id.match(/\*/)
       return multi_edge(md, attrs)
