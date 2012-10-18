@@ -30,7 +30,7 @@ EOS
 
   opt :name, "Graph name", :default => 'G'
   opt :type, "Graph type", :default => 'digraph'
+  opt :file, "Graph file", :default => 'graph.ru'
 end
 
-gfile = ARGV[0] || "graph.ru"
-gfile_eval(gfile, opts)
+gfile_eval(opts[:file], opts)

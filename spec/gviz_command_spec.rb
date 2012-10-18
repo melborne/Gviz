@@ -4,7 +4,7 @@ ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 
 describe "gviz command" do
   context "when a graph file exist" do
-    subject { syscmd "#{ROOT}/bin/gviz spec/graph.ru" }
+    subject { syscmd "#{ROOT}/bin/gviz -f spec/graph.ru" }
     it do
       should eql ~<<-EOS
         digraph G {
@@ -22,7 +22,7 @@ describe "gviz command" do
   end
 
   context "when a name option passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -n ABC spec/graph.ru" }
+    subject { syscmd "#{ROOT}/bin/gviz -n ABC -f spec/graph.ru" }
     it do
       should eql ~<<-EOS
         digraph ABC {
@@ -35,7 +35,7 @@ describe "gviz command" do
   end
 
   context "when a type option passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -t graph spec/graph.ru" }
+    subject { syscmd "#{ROOT}/bin/gviz -t graph -f spec/graph.ru" }
     it do
       should eql ~<<-EOS
         graph G {
