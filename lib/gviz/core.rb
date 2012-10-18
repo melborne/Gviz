@@ -190,6 +190,12 @@ class Gviz
     tabs = "  "
     result << "#{@type} #{@name} {"
 
+    subgraphs.each do |graph|
+      graph.to_s.lines do |line|
+        result << tabs + line.chomp
+      end
+    end
+
     unless graph_attrs.empty?
       result << tabs + build_attrs(graph_attrs, false).join(";\n#{tabs}") + ";"
     end
@@ -208,12 +214,6 @@ class Gviz
 
     @edges.values.each do |edge|
       result << tabs + "#{edge}#{build_attrs(edge.attrs)};"
-    end
-
-    subgraphs.each do |graph|
-      graph.to_s.lines do |line|
-        result << tabs + line.chomp
-      end
     end
 
     @ranks.each do |type, nodes|

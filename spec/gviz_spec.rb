@@ -453,14 +453,14 @@ describe Gviz do
       it do
         should eql ~<<-EOS
           digraph G {
-            a;
-            b;
-            a -> b;
             subgraph cluster0 {
               c;
               d;
               c -> d;
             }
+            a;
+            b;
+            a -> b;
           }
           EOS
       end
