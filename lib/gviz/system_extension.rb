@@ -28,3 +28,21 @@ class String
     gsub(/^ {#{margin}}/, '')
   end
 end
+
+class Array
+  def join_by(sep, by)
+    arr = self.dup
+    res, q, cnt = [], [], 0
+    while elm = arr.shift
+      cnt += elm.to_s.size
+      if cnt < by
+        q << elm
+      else
+        res << q.join(sep)
+        q.clear
+        cnt = 0
+      end
+    end
+    res
+  end
+end
