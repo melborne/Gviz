@@ -13,38 +13,6 @@ class OptionParser
       end
     end
 
-    def draw_graph(opts)
-      Graph(opts[:name], opts[:type]) { instance_eval ::File.read(opts[:file]) }
-    rescue Errno::ENOENT
-      abort "graph file `#{opts[:file]}` not found"
-    end
-
-    def print_manual(man)
-      attrs = %w(graph node edge subgraph cluster)
-      consts = %w(color_names color_schemes full_color_names
-                  full_color_schemes arrows shapes output_formats)
-      man_man = ~<<-EOS
-        --man(-m) accepts any of them:
-          graph, node, edge, subgraph, cluster,
-          arrows, shapes, output_formats
-          color_names, color_schemes,
-          full_color_names, full_color_schemes,
-        EOS
-
-      res =
-        case man.downcase
-        when 'man'
-          man_man
-        when *attrs
-          Gviz.ATTR(man)
-        when *consts
-          Gviz.const_get(man.upcase).join(", ")
-        else
-          "Error: unknown subcommand '#{man}' for --man\n" + man_man
-        end
-      puts res
-    end
-
     def build_opts
       Trollop::options do
         version "Gviz #{Gviz::VERSION} (c) 2012 kyoendo"
@@ -75,8 +43,47 @@ class OptionParser
         opt :man, "Show manual (ex. node, shapes, color_names)", :type => :string
       end
     end
+
+    def draw_graph(opts)
+      Graph(opts[:name], opts[:type]) { instance_eval ::File.read(opts[:file]) }
+    rescue Errno::ENOENT
+      abort "graph file `#{opts[:file]}` not found"
+    end
+
+    def print_manual(man)
+      attrs = %w(graph node edge subgraph cluster)
+      consts = %w(color_names color_schemes full_color_names
+                  full_color_schemes arrows shapes output_formats)
+      man_man = ~<<-EOS
+        --man(-m) accepts any of them:
+          graph, node, edge, subgraph, cluster,
+          arrows, shapes, output_formats
+          color_names, color_schemes,
+          full_color_names, full_color_schemes,
+        EOS
+
+      res =
+        case man.downcase
+        when 'man'
+          man_man
+        when *attrs
+          format_attrs(man)
+        when *consts
+          Gviz.const_get(man.upcase).join(", ")
+        else
+          "Error: unknown subcommand '#{man}' for --man\n" + man_man
+        end
+      puts res
+    end
+
+    def format_attrs(target)
+      attr_name = %w(Graph Node Edge Subgraph Cluster).detect { |n| n == target.capitalize }
+      header = ["- #{attr_name} attributes (type|default|minimum|notes) -"]
+      attrs = Gviz.ATTR(target).map { |attr, desc| "#{attr} (#{desc.join(" | ")})" }
+      [header] + attrs
+    end
   end
-  private_class_method :build_opts, :draw_graph, :print_manual
+  private_class_method :build_opts, :draw_graph, :print_manual, :format_attrs
 end
 
 OptionParser.parse!
