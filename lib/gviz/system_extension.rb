@@ -21,3 +21,10 @@ class Object
     to_s.hash.to_s.intern
   end
 end
+
+class String
+  def ~
+    margin = scan(/^ +/).map(&:size).min
+    gsub(/^ {#{margin}}/, '')
+  end
+end

@@ -1,36 +1,51 @@
 #!/usr/bin/env ruby
-require "gviz"
+# require "gviz"
+require_relative "../lib/gviz"
 require "trollop"
 
-def gfile_eval(gfile, opts)
-  Graph(opts[:name], opts[:type]) { instance_eval ::File.read(gfile) }
-rescue Errno::ENOENT
-  abort "graph file `#{gfile}` not found"
+class OptionParser
+  class << self
+    def parse!
+      opts = build_opts
+      draw_graph(opts)
+    end
+
+    def draw_graph(opts)
+      Graph(opts[:name], opts[:type]) { instance_eval ::File.read(opts[:file]) }
+    rescue Errno::ENOENT
+      abort "graph file `#{opts[:file]}` not found"
+    end
+
+    def build_opts
+      Trollop::options do
+        version "Gviz #{Gviz::VERSION} (c) 2012 kyoendo"
+        banner ~<<-EOS
+          Gviz is a tool for generating graphviz dot data with simple Ruby's syntax.
+          It works with a graph spec file in which a graph spec describes with 
+          several gviz commands. If 'graph.ru' file exist on a directory of the 
+          execution, it will be automatically loaded as a graph spec file.
+
+          Example of graph.ru:
+
+                route :main => [:init, :parse, :cleanup, :printf]
+                route :init => :make, :parse => :execute
+                route :execute => [:make, :compare, :printf]
+
+                save(:sample, :png)
+
+          Usage:
+
+                gviz [options] <graph filename>
+
+          where [options] are:
+          EOS
+
+        opt :name, "Graph name", :default => 'G'
+        opt :type, "Graph type", :default => 'digraph'
+        opt :file, "Graph file", :default => 'graph.ru'
+      end
+    end
+  end
 end
 
-opts = Trollop::options do
-  version "Gviz #{Gviz::VERSION} (c) 2012 kyoendo"
-  banner <<-EOS
-Gviz is a tool for generating graphviz dot data with simple Ruby's syntax. It works with a graph spec file in which a graph spec describes with several gviz commands. If 'graph.ru' file exist on a directory of the execution, it will be automatically loaded as a graph spec file.
-
-Example of graph.ru:
-
-      route :main => [:init, :parse, :cleanup, :printf]
-      route :init => :make, :parse => :execute
-      route :execute => [:make, :compare, :printf]
-
-      save(:sample, :png)
-
-Usage:
-
-      gviz [options] <graph filename>
-
-where [options] are:
-EOS
-
-  opt :name, "Graph name", :default => 'G'
-  opt :type, "Graph type", :default => 'digraph'
-  opt :file, "Graph file", :default => 'graph.ru'
-end
-
-gfile_eval(opts[:file], opts)
+OptionParser.parse!
