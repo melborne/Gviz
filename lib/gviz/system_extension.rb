@@ -20,6 +20,13 @@ class Object
   def to_id
     to_s.hash.to_s.intern
   end
+
+  # Returns a wrapped string with specific wrappers
+  # for building a label using record shape.
+  # Default wrapper is '{ }'
+  def wrap(by=['{','}'])
+    by.insert(1, self).join
+  end
 end
 
 class String
@@ -44,5 +51,16 @@ class Array
       end
     end
     res
+  end
+
+  # Returns a tileized string for building
+  # a label using record shape.
+  #
+  #   [[[:a, :b], :c], [1, 2, 3]].tileize # => "{{{a|b}|c}|{1|2|3}}"
+  #
+  def tileize
+    self.map do |x|
+      x.is_a?(Array) ? x.tileize : x
+    end.join('|').wrap
   end
 end

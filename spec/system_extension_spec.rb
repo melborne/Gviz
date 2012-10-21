@@ -56,4 +56,29 @@ describe Object do
       end
     end
   end
+
+  describe "#wrap" do
+    it "works for any object" do
+      'a'.wrap(['(',')']).should eql '(a)'
+      10.wrap(['<','>']).should eql '<10>'
+      :a.wrap(['/','/']).should eql '/a/'
+    end
+
+    it "wrap with '{}' in default" do
+      'a'.wrap.should eql '{a}'
+      10.wrap.should eql '{10}'
+      :a.wrap.should eql '{a}'
+    end
+  end
+end
+
+describe Array do
+  describe "#tileize" do
+    it "build label for record shape" do
+      [:a, :b].tileize.should eql "{a|b}"
+      [[:a, :b], [1, 2]].tileize.should eql "{{a|b}|{1|2}}"
+      [[:a, :b], [1, 2], [:x, :y]].tileize.should eql "{{a|b}|{1|2}|{x|y}}"
+      [[[:a, :b], :c], [1, 2, 3]].tileize.should eql "{{{a|b}|c}|{1|2|3}}"
+    end
+  end
 end
