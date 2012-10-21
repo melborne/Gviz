@@ -48,19 +48,26 @@ describe "gviz command" do
   end
 
   context "when -m with correct attr passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -m arrows" }
-    it { should eql Gviz::ARROWS.join(", ") + "\n" }
+    subject { syscmd("#{ROOT}/bin/gviz -m arrows") }
+    it do
+      should eql ~<<-EOS
+        \e[35mArrows:\e[0m
+          box, lbox, rbox, obox, olbox, orbox, crow, lcrow, rcrow, diamond, ldiamond, rdiamond
+          oldiamond, ordiamond, dot, odot, inv, linv, rinv, oinv, olinv, orinv, none, normal, lnormal
+      EOS
+    end
   end
 
   context "when -m with man word passed" do
     subject { syscmd "#{ROOT}/bin/gviz -m man" }
     it do
       should eql ~<<-EOS
-        --man(-m) accepts any of them:
+        \e[35m--man(-m) accepts any of them:\e[0m
           graph, node, edge, subgraph, cluster,
           arrows, shapes, output_formats
           color_names, color_schemes,
           full_color_names, full_color_schemes,
+          svg_color_names, dark_colors
         EOS
     end
   end
@@ -70,11 +77,12 @@ describe "gviz command" do
     it do
       should eql ~<<-EOS
         Error: unknown subcommand 'abc' for --man
-        --man(-m) accepts any of them:
+        \e[35m--man(-m) accepts any of them:\e[0m
           graph, node, edge, subgraph, cluster,
           arrows, shapes, output_formats
           color_names, color_schemes,
           full_color_names, full_color_schemes,
+          svg_color_names, dark_colors
         EOS
     end
   end
