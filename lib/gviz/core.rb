@@ -64,7 +64,7 @@ class Gviz
   #
   # You can define a endpoint to a node, by adding a point identifier
   # with a colon after the each node. You must specify the identifiers
-  # it the label of the corresponding nodes.
+  # in the label of the corresponding nodes.
   #
   #   gv.edge("a:x_b:y")
   #   gv.node(:a, label:"<x> 1 | 2 | 3")
