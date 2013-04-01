@@ -53,12 +53,12 @@ class OptionParser
     def print_manual(man)
       attrs = %w(graph node edge subgraph cluster)
       consts = %w(color_names color_schemes full_color_names
-                  full_color_schemes arrows shapes output_formats
-                  svg_color_names dark_colors)
+                  full_color_schemes arrows shapes layouts
+                  output_formats svg_color_names dark_colors)
       man_man = ~<<-EOS
         \e[35m--man(-m) accepts any of them:\e[0m
           graph, node, edge, subgraph, cluster,
-          arrows, shapes, output_formats
+          arrows, shapes, layouts, output_formats
           color_names, color_schemes,
           full_color_names, full_color_schemes,
           svg_color_names, dark_colors

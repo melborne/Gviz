@@ -29,6 +29,8 @@ ARROWS = ["box", "lbox", "rbox", "obox", "olbox", "orbox", "crow", "lcrow", "rcr
 # http://www.graphviz.org/content/node-shapes
 SHAPES = ["box", "polygon", "ellipse", "oval", "circle", "point", "egg", "triangle", "plaintext", "diamond", "trapezium", "parallelogram", "house", "pentagon", "hexagon", "septagon", "octagon", "doublecircle", "doubleoctagon", "tripleoctagon", "invtriangle", "invtrapezium", "invhouse", "Mdiamond", "Msquare", "Mcircle", "rect", "rectangle", "square", "none", "note", "tab", "folder", "box3d", "component", "promoter", "cds", "terminator", "utr", "primersite", "restrictionsite", "fivepoverhang", "threepoverhang", "noverhang", "assembly", "signature", "insulator", "ribosite", "rnastab", "proteasesite", "proteinstab", "rpromoter", "rarrow", "larrow", "lpromoter"]
 
+# Graph Layouts
+LAYOUTS = %w(circo dot fdp neato nop nop1 nop2 osage patchwork sfdp twopi)
 
 # Output Formats
 # http://www.graphviz.org/content/output-formats
