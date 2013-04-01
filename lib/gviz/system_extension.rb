@@ -50,6 +50,7 @@ class Array
         cnt = 0
       end
     end
+    res << q.join(sep) unless q.empty?
     res
   end
 
