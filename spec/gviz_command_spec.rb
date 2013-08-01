@@ -1,89 +1,112 @@
 require_relative "spec_helper"
 
-ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+describe Gviz::Command do
+  before(:each) do
+    $stdout, $stderr = StringIO.new, StringIO.new
+    @original_dir = Dir.pwd
+    Dir.chdir(source_root)
+  end
 
-describe "gviz command" do
-  context "when a graph file exist" do
-    subject { syscmd "#{ROOT}/bin/gviz -f spec/graph.ru" }
-    it do
-      should eql ~<<-EOS
-        digraph G {
-          a;
-          b;
-          a -> b;
-        }
-        EOS
+  after(:each) do
+    $stdout, $stderr = STDOUT, STDERR
+    Dir.chdir(@original_dir)
+  end
+
+  describe 'unknown command' do
+    it 'outputs error messager' do
+      Gviz::Command.start(['unknown'])
+      expect($stderr.string).to eq "Could not find task \"unknown\".\n"
     end
   end
 
-  context "when a graph file not exist" do
-    subject { syscmd "#{ROOT}/bin/gviz", :err }
-    it { should eql "graph file `graph.ru` not found\n" }
-  end
-
-  context "when a name option passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -n ABC -f spec/graph.ru" }
-    it do
-      should eql ~<<-EOS
-        digraph ABC {
-          a;
-          b;
-          a -> b;
-        }
+  describe '#build' do
+    context 'with a graph file' do
+      it 'output a dot data' do
+        Gviz::Command.start(['build', 'graph.ru'])
+        expect($stdout.string).to eq ~<<-EOS
+          digraph G {
+            a;
+            b;
+            a -> b;
+          }
         EOS
+      end
+    end
+
+    context 'without a graph file' do
+      it 'read "graph.ru" as a graph file' do
+        Gviz::Command.start(['build'])
+        expect($stdout.string).to eq ~<<-EOS
+          digraph G {
+            a;
+            b;
+            a -> b;
+          }
+        EOS
+      end
+    end
+
+    context 'when no graph file found' do
+      it 'abort the process' do
+        file = "no_existing_file"
+        expect{ Gviz::Command.start(['build', file]) }.to raise_error(SystemExit, "graph file `#{file}` not found")
+      end
+    end
+
+    context "name option" do
+      it 'set a graph name' do
+        Gviz::Command.start(['build', '--name', 'ABC'])
+        expect($stdout.string).to eq ~<<-EOS
+          digraph ABC {
+            a;
+            b;
+            a -> b;
+          }
+          EOS
+      end
+    end
+  
+    context "type option" do
+      it 'set a graph type' do
+        Gviz::Command.start(['build', '--type', 'graph'])
+        expect($stdout.string).to eq ~<<-EOS
+          graph G {
+            a;
+            b;
+            a -> b;
+          }
+          EOS
+      end
     end
   end
 
-  context "when a type option passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -t graph -f spec/graph.ru" }
-    it do
-      should eql ~<<-EOS
-        graph G {
-          a;
-          b;
-          a -> b;
-        }
-        EOS
+  describe '#man' do
+    context 'arrows subcommand' do
+      it 'shows all of arrow types' do
+        Gviz::Command.start(['man', 'arrows'])
+        expect($stdout.string).to match /Arrows:.*crow.*linv.*lcurve/m
+      end
     end
-  end
 
-  context "when -m with correct attr passed" do
-    subject { syscmd("#{ROOT}/bin/gviz -m arrows") }
-    it do
-      should eql ~<<-EOS
-        \e[35mArrows:\e[0m
-          box, lbox, rbox, obox, olbox, orbox, crow, lcrow, rcrow, diamond, ldiamond, rdiamond
-          oldiamond, ordiamond, dot, odot, inv, linv, rinv, oinv, olinv, orinv, none, normal, lnormal
-      EOS
+    context 'man subcommand' do
+      it 'shows all of subcommands' do
+        Gviz::Command.start(['man', 'man'])
+        expect($stdout.string).to match /graph.*subgraph.*shapes.*dark_colors/m
+      end
     end
-  end
 
-  context "when -m with man word passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -m man" }
-    it do
-      should eql ~<<-EOS
-        \e[35m--man(-m) accepts any of them:\e[0m
-          graph, node, edge, subgraph, cluster,
-          arrows, shapes, output_formats
-          color_names, color_schemes,
-          full_color_names, full_color_schemes,
-          svg_color_names, dark_colors
-        EOS
-    end
-  end
-
-  context "when -m with incorrect attr passed" do
-    subject { syscmd "#{ROOT}/bin/gviz -m abc" }
-    it do
-      should eql ~<<-EOS
-        Error: unknown subcommand 'abc' for --man
-        \e[35m--man(-m) accepts any of them:\e[0m
-          graph, node, edge, subgraph, cluster,
-          arrows, shapes, output_formats
-          color_names, color_schemes,
-          full_color_names, full_color_schemes,
-          svg_color_names, dark_colors
-        EOS
+    # context 'without subcommand' do
+    #   it 'shows man toppage' do
+    #     Gviz::Command.start(['man'])
+    #     expect($stdout.string).to match "hi"
+    #   end
+    # end
+    # 
+    context 'unknown subcommand' do
+      it 'raise an error' do
+        Gviz::Command.start(['man', 'unknown'])
+        expect($stderr.string).to eq "Could not find task \"unknown\".\n"
+      end
     end
   end
 end
