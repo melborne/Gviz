@@ -81,27 +81,42 @@ describe Gviz::Command do
   end
 
   describe '#man' do
-    context 'arrows subcommand' do
-      it 'shows all of arrow types' do
-        Gviz::Command.start(['man', 'arrows'])
-        expect($stdout.string).to match /Arrows:.*crow.*linv.*lcurve/m
+    context 'attributes subcommand' do
+      it 'shows attributes for graphviz' do
+        Gviz::Command.start(['man', 'attribute'])
+        expect($stdout.string).to match /Graph.*Node.*Edge.*Subgraph.*Cluster/m
+      end
+
+      it 'shows Graph attributes' do
+        Gviz::Command.start(['man', 'attribute', 'graph'])
+        expect($stdout.string).to match /Graph attributes/
       end
     end
 
-    context 'man subcommand' do
-      it 'shows all of subcommands' do
-        Gviz::Command.start(['man', 'man'])
-        expect($stdout.string).to match /graph.*subgraph.*shapes.*dark_colors/m
+    context 'constant subcommand' do
+      it 'shows constants for graphviz' do
+        Gviz::Command.start(['man', 'constant'])
+        expect($stdout.string).to match /Arrows.*Shapes.*Layouts.*Output/m
+      end
+
+      it 'shows Arrows varieties' do
+        Gviz::Command.start(['man', 'constant', 'arrows'])
+        expect($stdout.string).to match /Arrows:/
       end
     end
 
-    # context 'without subcommand' do
-    #   it 'shows man toppage' do
-    #     Gviz::Command.start(['man'])
-    #     expect($stdout.string).to match "hi"
-    #   end
-    # end
-    # 
+    context 'color subcommand' do
+      it 'shows colors attributes' do
+        Gviz::Command.start(['man', 'color'])
+        expect($stdout.string).to match /Color names.*Color schemes.*Dark colors/m
+      end
+
+      it 'shows Color names' do
+        Gviz::Command.start(['man', 'color', 'color_names'])
+        expect($stdout.string).to match /Color names/
+      end
+    end
+
     context 'unknown subcommand' do
       it 'raise an error' do
         Gviz::Command.start(['man', 'unknown'])
