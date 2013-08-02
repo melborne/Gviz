@@ -84,7 +84,7 @@ describe Gviz::Command do
     context 'attributes subcommand' do
       it 'shows attributes for graphviz' do
         Gviz::Command.start(['man', 'attribute'])
-        expect($stdout.string).to match /Graph.*Node.*Edge.*Subgraph.*Cluster/m
+        expect($stdout.string).to match /specify.*graph.*node.*cluster/
       end
 
       it 'shows Graph attributes' do
@@ -96,7 +96,7 @@ describe Gviz::Command do
     context 'constant subcommand' do
       it 'shows constants for graphviz' do
         Gviz::Command.start(['man', 'constant'])
-        expect($stdout.string).to match /Arrows.*Shapes.*Layouts.*Output/m
+        expect($stdout.string).to match /specify.*arrows.*format/ 
       end
 
       it 'shows Arrows varieties' do
@@ -108,7 +108,7 @@ describe Gviz::Command do
     context 'color subcommand' do
       it 'shows colors attributes' do
         Gviz::Command.start(['man', 'color'])
-        expect($stdout.string).to match /Color names.*Color schemes.*Dark colors/m
+        expect($stdout.string).to match /specify.*names.*dark/
       end
 
       it 'shows Color names' do
