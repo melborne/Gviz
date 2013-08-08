@@ -12,13 +12,6 @@ describe Gviz::Command do
     Dir.chdir(@original_dir)
   end
 
-  describe 'unknown command' do
-    it 'outputs error messager' do
-      Gviz::Command.start(['unknown'])
-      expect($stderr.string).to eq "Could not find task \"unknown\".\n"
-    end
-  end
-
   describe '#build' do
     context 'with a graph file' do
       it 'output a dot data' do
@@ -81,47 +74,39 @@ describe Gviz::Command do
   end
 
   describe '#man' do
-    context 'attributes subcommand' do
-      it 'shows attributes for graphviz' do
-        Gviz::Command.start(['man', 'attribute'])
-        expect($stdout.string).to match /specify.*graph.*node.*cluster/
-      end
-
-      it 'shows Graph attributes' do
-        Gviz::Command.start(['man', 'attribute', 'graph'])
-        expect($stdout.string).to match /Graph attributes/
-      end
+    it 'shows arguments list without argument' do
+      Gviz::Command.start(['man'])
+      expect($stdout.string).to match /Specify any of/
     end
 
-    context 'constant subcommand' do
-      it 'shows constants for graphviz' do
-        Gviz::Command.start(['man', 'constant'])
-        expect($stdout.string).to match /specify.*arrows.*format/ 
-      end
-
-      it 'shows Arrows varieties' do
-        Gviz::Command.start(['man', 'constant', 'arrows'])
-        expect($stdout.string).to match /Arrows:/
-      end
+    it "shows Graph's attributes" do
+      Gviz::Command.start(['man', 'graph'])
+      expect($stdout.string).to match /Graph attributes/
     end
 
-    context 'color subcommand' do
-      it 'shows colors attributes' do
-        Gviz::Command.start(['man', 'color'])
-        expect($stdout.string).to match /specify.*names.*dark/
-      end
-
-      it 'shows Color names' do
-        Gviz::Command.start(['man', 'color', 'color_names'])
-        expect($stdout.string).to match /Color names/
-      end
+    it "shows Node's attributes" do
+      Gviz::Command.start(['man', 'node'])
+      expect($stdout.string).to match /Node attributes/
     end
 
-    context 'unknown subcommand' do
-      it 'raise an error' do
-        Gviz::Command.start(['man', 'unknown'])
-        expect($stderr.string).to eq "Could not find task \"unknown\".\n"
-      end
+    it "shows Arrow types" do
+      Gviz::Command.start(['man', 'arrows'])
+      expect($stdout.string).to match /Arrows/
+    end
+
+    it "shows Output formats" do
+      Gviz::Command.start(['man', 'output_formats'])
+      expect($stdout.string).to match /Output formats/
+    end
+
+    it "shows Color names" do
+      Gviz::Command.start(['man', 'color_names'])
+      expect($stdout.string).to match /Color names/
+    end
+
+    it "shows Colors" do
+      Gviz::Command.start(['man', 'colors'])
+      expect($stdout.string).to match /Color/
     end
   end
 end

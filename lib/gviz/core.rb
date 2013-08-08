@@ -115,7 +115,7 @@ class Gviz
     end
   end
   
-  # +graph+ is a shorcut method.
+  # +graph+ is a shortcut method.
   #
   #   gv = Gviz.new
   #   gv.graph do
