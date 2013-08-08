@@ -118,14 +118,12 @@ Example of graph.ru:
 
 Usage:
 
-      gviz [options] <graph filename>
+      gviz build [FILE] [options]
 
 where [options] are:
 
     --name,   -n :   Graph name (default: G)
     --type,   -t :   Graph type (default: digraph)
-    --version, -v:   Print version and exit
-    --help,    -h:   Show this message
 
 ## Contributing
 
