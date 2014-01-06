@@ -9,6 +9,7 @@ describe Gviz do
       expect(@node).to be_a_instance_of Gviz::Node
       expect(@node.id).to eq :a 
       expect(@node.attrs).to eq({pos:"1,2!", width:10, color:"black",fillcolor:"white"})
+      expect(gv.graph_attrs).to eq({layout:"neato"})
     end
   end
 end
