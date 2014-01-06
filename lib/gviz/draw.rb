@@ -1,9 +1,19 @@
 module Draw
-  def circle(id, x:0, y:0, r:0.5, **attrs)
+  def ellipse(id, x:0, y:0, **attrs)
+    draw_init
     attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
-    attrs.update(shape:"circle", pos:"#{x},#{y}!", width:r*2)
+    attrs.update(shape:"ellipse", pos:"#{x},#{y}!")
+    node(id, attrs)
+  end
+
+  def circle(id, x:0, y:0, r:0.5, **attrs)
+    attrs.update(width:r*2)
+    ellipse(id, x:x, y:y, **attrs)
+  end
+
+  private
+  def draw_init
     global(layout:"neato")
     nodes(style:"filled")
-    node(id, attrs)
   end
 end

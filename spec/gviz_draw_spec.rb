@@ -4,7 +4,7 @@ describe Gviz do
   let(:gv) { Gviz.new }
 
   describe "#circle" do
-    let(:defo_attrs) { {shape:"circle", pos:"0,0!", width:1, label:"", color:"black", fillcolor:"#FFFFFF00"} }
+    let(:defo_attrs) { {shape:"ellipse", pos:"0,0!", width:1, label:"", color:"black", fillcolor:"#FFFFFF00"} }
     context 'without attributes' do
       it 'returns a circle node with default attributes' do
         circle = gv.circle(:a)
@@ -24,6 +24,18 @@ describe Gviz do
       it 'overwrites shape and pos attrs if they are passed' do
         circle = gv.circle(:a, shape:"box", pos:"10,10!")
         expect(circle.attrs).to eq defo_attrs
+      end
+    end
+  end
+
+  describe "#ellipse" do
+    let(:defo_attrs) { {shape:"ellipse", pos:"0,0!", label:"", color:"black", fillcolor:"#FFFFFF00"} }
+    context 'without attributes' do
+      it 'returns a ellipse node with default attributes' do
+        ellipse = gv.ellipse(:a)
+        expect(ellipse).to be_a_instance_of Gviz::Node
+        expect(ellipse.id).to eq :a
+        expect(ellipse.attrs).to eq defo_attrs
       end
     end
   end
