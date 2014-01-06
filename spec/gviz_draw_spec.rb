@@ -38,5 +38,18 @@ describe Gviz do
         expect(ellipse.attrs).to eq defo_attrs
       end
     end
+
+    context 'with some attributes' do
+      it 'returns a ellipse node with attributes' do
+        ellipse = gv.ellipse(:a, x:10, y:-20, fillcolor:"green", label:"a", width:2, height:4)
+        attrs = defo_attrs.merge(pos:"10,-20!", width:2, height:4, label:"a", fillcolor:"green")
+        expect(ellipse.attrs).to eq attrs
+      end
+
+      it 'overwrites shape and pos attrs if they are passed' do
+        ellipse = gv.ellipse(:a, shape:"box", pos:"10,10!")
+        expect(ellipse.attrs).to eq defo_attrs
+      end
+    end
   end
 end
