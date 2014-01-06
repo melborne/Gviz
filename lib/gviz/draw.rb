@@ -11,6 +11,13 @@ module Draw
     ellipse(id, x:x, y:y, **attrs)
   end
 
+  def rect(id, x:0, y:0, **attrs)
+    draw_init
+    attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
+    attrs.update(shape:"rect", pos:"#{x},#{y}!")
+    node(id, attrs)
+  end
+
   private
   def draw_init
     global(layout:"neato")
