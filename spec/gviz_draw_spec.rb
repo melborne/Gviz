@@ -72,4 +72,22 @@ describe Gviz do
       end
     end
   end
+
+  describe "#square" do
+    let(:defo_attrs) { {shape:"rect", pos:"0,0!", label:"", color:"black", fillcolor:"#FFFFFF00"} }
+    context 'without attributes' do
+      it 'returns a square node with default attributes' do
+        square = gv.square(:a)
+        expect(square.attrs).to eq defo_attrs
+      end
+    end
+
+    context 'with some attributes' do
+      it 'returns a square node with attributes' do
+        square = gv.square(:a, x:10, y:-20, fillcolor:"green", label:"a", width:2)
+        attrs = defo_attrs.merge(pos:"10,-20!", width:2, label:"a", fillcolor:"green")
+        expect(square.attrs).to eq attrs
+      end
+    end
+  end
 end

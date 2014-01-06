@@ -18,6 +18,13 @@ module Draw
     node(id, attrs)
   end
 
+  def square(id, x:0, y:0, **attrs)
+    w, h = %i(width height).map { |at| attrs.delete at }
+    size = w || h
+    attrs.update(width:size) if size
+    rect(id, x:x, y:y, **attrs)
+  end
+
   private
   def draw_init
     global(layout:"neato")
