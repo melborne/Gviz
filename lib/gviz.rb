@@ -1,5 +1,7 @@
 # encoding: UTF-8
+require "gviz/draw"
 class Gviz
+  include Draw
 end
 
 # +Graph+ fuction is a shortcut method of `Gviz#graph`.
