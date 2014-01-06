@@ -4,12 +4,27 @@ describe Gviz do
   let(:gv) { Gviz.new }
 
   describe "#circle" do
-    before { @node = gv.circle(:a, x:1, y:2, r:10) }
-    it 'generate a node with circle shape' do
-      expect(@node).to be_a_instance_of Gviz::Node
-      expect(@node.id).to eq :a 
-      expect(@node.attrs).to eq({pos:"1,2!", width:10, color:"black",fillcolor:"white"})
-      expect(gv.graph_attrs).to eq({layout:"neato"})
+    let(:defo_attrs) { {shape:"circle", pos:"0,0!", width:1, label:"", color:"black", fillcolor:"#FFFFFF00"} }
+    context 'without attributes' do
+      it 'returns a circle node with default attributes' do
+        circle = gv.circle(:a)
+        expect(circle).to be_a_instance_of Gviz::Node
+        expect(circle.id).to eq :a
+        expect(circle.attrs).to eq defo_attrs
+      end
+    end
+
+    context 'with some attributes' do
+      it 'returns a circle node with attributes' do
+        circle = gv.circle(:a, x:10, y:-20, r:1, fillcolor:"green", label:"a")
+        attrs = defo_attrs.merge(pos:"10,-20!", width:2, label:"a", fillcolor:"green")
+        expect(circle.attrs).to eq attrs
+      end
+
+      it 'overwrites shape and pos attrs if they are passed' do
+        circle = gv.circle(:a, shape:"box", pos:"10,10!")
+        expect(circle.attrs).to eq defo_attrs
+      end
     end
   end
 end
