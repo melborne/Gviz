@@ -11,13 +11,6 @@ module Draw
     ellipse(id, x:x, y:y, **attrs)
   end
 
-  def rect(id, x:0, y:0, **attrs)
-    draw_init
-    attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
-    attrs.update(shape:"rect", pos:"#{x},#{y}!")
-    node(id, attrs)
-  end
-
   def square(id, x:0, y:0, **attrs)
     w, h = %i(width height).map { |at| attrs.delete at }
     size = w || h || 1
@@ -43,6 +36,15 @@ module Draw
           color:"#FFFFFF00", fillcolor:"#FFFFFF00")
     attrs.update(arrowhead:"none")
     edge(:"#{n1_id}_#{n2_id}", attrs)
+  end
+
+  ["rect", "box", "polygon", "oval", "egg", "triangle", "plaintext", "diamond", "trapezium", "house", "pentagon", "hexagon", "septagon", "octagon", "doublecircle", "doubleoctagon", "invtriangle", "invtrapezium", "invhouse", "Mdiamond", "Msquare", "Mcircle", "rectangle", "none", "note", "tab", "folder", "box3d", "component", "promoter", "cds", "terminator", "utr", "primersite", "fivepoverhang", "threepoverhang", "noverhang", "assembly", "signature", "insulator", "rnastab", "proteasesite", "proteinstab", "rpromoter", "rarrow", "larrow", "lpromoter"].each do |shape|
+    define_method(shape) do |id, x:0, y:0, **attrs|
+      draw_init
+      attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
+      attrs.update(shape:shape, pos:"#{x},#{y}!")
+      node(id, attrs)
+    end
   end
 
   private
