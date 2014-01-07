@@ -1,5 +1,3 @@
-require_relative "graphviz_attrs"
-
 module Draw
   def ellipse(id, x:0, y:0, **attrs)
     draw_init
