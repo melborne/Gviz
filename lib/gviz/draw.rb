@@ -1,3 +1,5 @@
+require_relative "graphviz_attrs"
+
 module Draw
   def ellipse(id, x:0, y:0, **attrs)
     draw_init
@@ -38,7 +40,8 @@ module Draw
     edge(:"#{n1_id}_#{n2_id}", attrs)
   end
 
-  ["rect", "box", "polygon", "oval", "egg", "triangle", "plaintext", "diamond", "trapezium", "house", "pentagon", "hexagon", "septagon", "octagon", "doublecircle", "doubleoctagon", "invtriangle", "invtrapezium", "invhouse", "Mdiamond", "Msquare", "Mcircle", "rectangle", "none", "note", "tab", "folder", "box3d", "component", "promoter", "cds", "terminator", "utr", "primersite", "fivepoverhang", "threepoverhang", "noverhang", "assembly", "signature", "insulator", "rnastab", "proteasesite", "proteinstab", "rpromoter", "rarrow", "larrow", "lpromoter"].each do |shape|
+  Gviz::SHAPES.each do |shape|
+    next if %w(ellipse circle square point plaintext none).include?(shape)
     define_method(shape) do |id, x:0, y:0, **attrs|
       draw_init
       attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
