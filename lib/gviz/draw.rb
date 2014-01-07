@@ -20,8 +20,8 @@ module Draw
 
   def square(id, x:0, y:0, **attrs)
     w, h = %i(width height).map { |at| attrs.delete at }
-    size = w || h
-    attrs.update(width:size) if size
+    size = w || h || 1
+    attrs.update(width:size, height:size)
     rect(id, x:x, y:y, **attrs)
   end
 
