@@ -1,4 +1,7 @@
+# Draw module includes a set of methods for specific shapes.
+# Each methods defines with shape name and its positions.
 module Draw
+  # Define a node with ellipse shape.
   def ellipse(id, x:0, y:0, **attrs)
     draw_init
     attrs = {label:"", color:"black", fillcolor:"#FFFFFF00"}.merge(attrs)
@@ -6,11 +9,13 @@ module Draw
     node(id, attrs)
   end
 
+  # Define a node with circle shape.
   def circle(id, x:0, y:0, r:0.5, **attrs)
     attrs.update(width:r*2, height:r*2)
     ellipse(id, x:x, y:y, **attrs)
   end
 
+  # Define a node with square shape.
   def square(id, x:0, y:0, **attrs)
     w, h = %i(width height).map { |at| attrs.delete at }
     size = w || h || 1
@@ -18,12 +23,14 @@ module Draw
     rect(id, x:x, y:y, **attrs)
   end
 
+  # Define a node with point shape.
   def point(id, x:0, y:0, **attrs)
     draw_init
     attrs.update(shape:"point", pos:"#{x},#{y}!")
     node(id, attrs)
   end
 
+  # Define a line with an edge and two point nodes.
   def line(id, from:[0,0], **attrs)
     draw_init
     unless to = attrs.delete(:to)
@@ -38,6 +45,7 @@ module Draw
     edge(:"#{n1_id}_#{n2_id}", attrs)
   end
 
+  # Define methods for other shapes
   Gviz::SHAPES.each do |shape|
     next if %w(ellipse circle square point plaintext none).include?(shape)
     define_method(shape) do |id, x:0, y:0, **attrs|
