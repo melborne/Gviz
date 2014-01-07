@@ -115,8 +115,8 @@ describe Gviz do
       expect(gv.nodeset.size).to eq 2
       expect(gv.edgeset.size).to eq 1
       n1, n2 = gv.nodeset
-      expect(n1.attrs).to eq(shape:"point", pos:"50,50!")
-      expect(n2.attrs).to eq(shape:"point", pos:"100,100!")
+      expect(n1.attrs).to eq(shape:"point", pos:"50,50!", color:"#FFFFFF00", fillcolor:"#FFFFFF00")
+      expect(n2.attrs).to eq(shape:"point", pos:"100,100!", color:"#FFFFFF00", fillcolor:"#FFFFFF00")
       expect(line.id).to eq :"#{n1.id}_#{n2.id}"
     end
 
@@ -124,8 +124,8 @@ describe Gviz do
       it 'returns [0,0] without "from" argument' do
         line = gv.line(:a, to:[100,100])
         n1, n2 = gv.nodeset
-        expect(n1.attrs).to eq(shape:"point", pos:"0,0!")
-        expect(n2.attrs).to eq(shape:"point", pos:"100,100!")
+        expect(n1.attrs).to eq(shape:"point", pos:"0,0!", color:"#FFFFFF00", fillcolor:"#FFFFFF00")
+        expect(n2.attrs).to eq(shape:"point", pos:"100,100!", color:"#FFFFFF00", fillcolor:"#FFFFFF00")
       end
 
       it 'raise an ArgumentError without "to" argument' do
