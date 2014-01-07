@@ -7,7 +7,7 @@ module Draw
   end
 
   def circle(id, x:0, y:0, r:0.5, **attrs)
-    attrs.update(width:r*2)
+    attrs.update(width:r*2, height:r*2)
     ellipse(id, x:x, y:y, **attrs)
   end
 
