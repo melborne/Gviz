@@ -48,7 +48,7 @@ Add some attributes to the graph, nodes, edges.
     ## add bgcolor to a graph(global method)
     require "gviz"
     
-    Graph.graph do
+    Graph do
       route :main => [:init, :parse, :cleanup, :printf]
       route :init => :make, :parse => :execute
       route :execute => [:make, :compare, :printf]
@@ -74,7 +74,7 @@ Modify some.
     ## define subgraph(subgraph method) 
     require "gviz"
     
-    Graph.graph do
+    Graph do
       route :main => [:init, :parse, :cleanup, :printf]
       route :init => :make, :parse => :execute
       route :execute => [:make, :compare, :printf]
@@ -101,6 +101,28 @@ Modify some.
 This outputs below.
 
 ![sample3](http://github.com/melborne/Gviz/raw/master/examples/sample3.png)
+
+## Use for Drawing
+
+Gviz helps you easily to draw shapes on an exact position using shape-named methods.
+
+    require "gviz"
+
+    Graph do
+      line :a, from:[-100,0], to:[100,0]
+      line :b, from:[0,-100], to:[0,100]
+      circle :c
+      rect :d, x:50, y:50, fillcolor:"green", label:"Rect"
+      triangle :e, x:50, y:-50, fillcolor:"cyan"
+      diamond :f, x:-50, y:50, fillcolor:"magenta"
+      egg :g, x:-50, y:-50, fillcolor:"yellow", label:"Egg"
+
+      save :draw
+    end
+
+This outputs below(consider a scale if save to output formats).
+
+![sample4](http://github.com/melborne/Gviz/raw/master/examples/sample4.png)
 
 
 Another examples are at `examples` directory
