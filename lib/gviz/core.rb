@@ -241,7 +241,13 @@ class Gviz
 
   def build_attrs(attrs, join=true)
     return nil if attrs.empty?
-    arr = attrs.map { |k, v| %(#{k}="#{v}").gsub("\n", "\\n") }
+    arr = attrs.map { |k, v|
+      if v.start_with?("<") && v.end_with?(">")
+        %(#{k}=#{v}).gsub("\n", "\\n")
+      else
+        %(#{k}="#{v}").gsub("\n", "\\n")
+      end
+    }
     join ? '[' + arr.join(',') + ']' : arr
   end
 
