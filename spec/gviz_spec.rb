@@ -422,7 +422,19 @@ describe Gviz do
           EOS
       end
     end
-    
+
+    context "when a label include HTML-like tags" do
+      before { gv.node(:a, label:'<<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>>') }
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a[label=<<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>>];
+          }
+          EOS
+      end
+    end
+
     context "take ports on edges" do
       before do
         gv.route(:a => [:b, :c])
