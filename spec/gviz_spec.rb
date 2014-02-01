@@ -277,6 +277,38 @@ describe Gviz do
         expect( gv.send("build_attrs", {width:1.0}) ).to eq "[width=\"1.0\"]"
       end
     end
+
+    context "handling newline characters in values" do
+      it "accepts as newline" do
+        expect( gv.send("build_attrs", {label:"hello\nworld"}) ).to eq "[label=\"hello\\nworld\"]"
+      end
+    end
+
+    context "with unicode" do
+      it "accepts as unicode values" do
+        expect( gv.send("build_attrs", {label:"こんにちは、世界！"}) ).to eq "[label=\"こんにちは、世界！\"]"
+      end
+    end
+
+    context "with HTML tag values" do
+      tag = '<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>'
+      it "accepts as HTML tags" do
+        expect( gv.send("build_attrs", {label:tag}) ).to eq "[label=<<TABLE><TR><TD><IMG SRC=\"logo.gif\" /></TD></TR></TABLE>>]"
+      end
+    end
+
+    context "with HTML tag values passed by heredoc" do
+      tag =<<-HTML
+      <TABLE>
+        <TR>
+          <TD><IMG SRC="logo2.gif" /></TD>
+        </TR>
+      </TABLE>
+      HTML
+      it "accepts as HTML tags" do
+        expect( gv.send("build_attrs", {label:tag}) ).to eq "[label=<<TABLE><TR><TD><IMG SRC=\"logo2.gif\" /></TD></TR></TABLE>>]"
+      end
+    end
   end
 
   describe "#to_s" do
@@ -402,60 +434,6 @@ describe Gviz do
             a;
             b;
             a -> b;
-          }
-          EOS
-      end
-    end
-
-    context "when a label include `\\n`" do
-      before { gv.node(:a, label:"hello\nworld") }
-      subject { gv.to_s }
-      it do
-        should eql ~<<-EOS
-          digraph G {
-            a[label="hello\\nworld"];
-          }
-          EOS
-      end
-    end
-
-    context "when a label include unicode" do
-      before { gv.node(:a, label:"こんにちは、世界！") }
-      subject { gv.to_s }
-      it do
-        should eql ~<<-EOS
-          digraph G {
-            a[label="こんにちは、世界！"];
-          }
-          EOS
-      end
-    end
-
-    context "when a label include HTML-like tags" do
-      before { gv.node(:a, label:'<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>') }
-      subject { gv.to_s }
-      it do
-        should eql ~<<-EOS
-          digraph G {
-            a[label=<<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>>];
-          }
-          EOS
-      end
-    end
-
-    context "when a label include HTML-like tags with heredoc" do
-      before { gv.node(:a, label:<<-HTML) }
-      <TABLE>
-        <TR>
-          <TD><IMG SRC="logo2.gif" /></TD>
-        </TR>
-      </TABLE>
-      HTML
-      subject { gv.to_s }
-      it do
-        should eql ~<<-EOS
-          digraph G {
-            a[label=<<TABLE><TR><TD><IMG SRC="logo2.gif" /></TD></TR></TABLE>>];
           }
           EOS
       end
