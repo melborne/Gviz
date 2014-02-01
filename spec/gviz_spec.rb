@@ -271,6 +271,14 @@ describe Gviz do
     end
   end
 
+  describe "#build_attrs" do
+    context "with non-string values" do
+      it "converts float to string" do
+        expect( gv.send("build_attrs", {width:1.0}) ).to eq "[width=\"1.0\"]"
+      end
+    end
+  end
+
   describe "#to_s" do
     context "without attrs" do
       before do
