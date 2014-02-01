@@ -242,8 +242,8 @@ class Gviz
   def build_attrs(attrs, join=true)
     return nil if attrs.empty?
     arr = attrs.map { |k, v|
-      if v.to_s.start_with?("<") && v.to_s.end_with?(">")
-        %(#{k}=#{v}).gsub("\n", "\\n")
+      if v.match(/^\s*<.*>\s*$/)  # accept HTML labels
+        "#{k}=<#{v}>".gsub("\n", '').gsub(/\s+</, '<')
       else
         %(#{k}="#{v}").gsub("\n", "\\n")
       end
