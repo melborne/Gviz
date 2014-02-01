@@ -424,12 +424,30 @@ describe Gviz do
     end
 
     context "when a label include HTML-like tags" do
-      before { gv.node(:a, label:'<<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>>') }
+      before { gv.node(:a, label:'<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>') }
       subject { gv.to_s }
       it do
         should eql ~<<-EOS
           digraph G {
             a[label=<<TABLE><TR><TD><IMG SRC="logo.gif" /></TD></TR></TABLE>>];
+          }
+          EOS
+      end
+    end
+
+    context "when a label include HTML-like tags with heredoc" do
+      before { gv.node(:a, label:<<-HTML) }
+      <TABLE>
+        <TR>
+          <TD><IMG SRC="logo2.gif" /></TD>
+        </TR>
+      </TABLE>
+      HTML
+      subject { gv.to_s }
+      it do
+        should eql ~<<-EOS
+          digraph G {
+            a[label=<<TABLE><TR><TD><IMG SRC="logo2.gif" /></TD></TR></TABLE>>];
           }
           EOS
       end
