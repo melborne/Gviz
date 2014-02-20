@@ -1,5 +1,7 @@
 # Gviz
 
+[![Build Status](https://travis-ci.org/melborne/Gviz.png?branch=master)](https://travis-ci.org/melborne/Gviz)
+
 Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax. Some implementations of `Gviz` are inspired by Ryan Davis's [Graph](https://github.com/seattlerb/graph 'seattlerb/graph').
 
 ## Installation
