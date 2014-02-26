@@ -195,7 +195,7 @@ describe Gviz do
       its(:size) { should eq 1 }
     end
 
-    context "when add one" do
+    context "when add two" do
       before do
         gv.subgraph { add :main => [:a, :b] }
         gv.subgraph { add :main => [:a, :b] }
@@ -204,9 +204,31 @@ describe Gviz do
       its(:size) { should eq 2 }
     end
 
+    context "without name" do
+      before do
+        @sub1 = gv.subgraph { add :main => [:a, :b] }
+        @sub2 = gv.subgraph { add :main => [:a, :b] }
+      end
+      it "returns a default name" do
+        expect(@sub1.name).to eq :cluster0
+        expect(@sub2.name).to eq :cluster1
+      end
+    end
+
+    context "with a name" do
+      before do
+        @sub1 = gv.subgraph(:cluA) { add :main => [:a, :b] }
+        @sub2 = gv.subgraph(:cluB) { add :main => [:a, :b] }
+      end
+      it "returns passed name" do
+        expect(@sub1.name).to eq :cluA
+        expect(@sub2.name).to eq :cluB
+      end
+    end
+
     context "it has a name other than `cluster**`" do
-      it "raise an error" do
-        ->{ gv.subgraph(:clu) {} }.should raise_error
+      it "not raise an error" do
+        ->{ gv.subgraph(:clu) {} }.should_not raise_error
       end
     end
   end

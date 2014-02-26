@@ -1,5 +1,5 @@
 class Gviz
-  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs, :ranks
+  attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs, :ranks, :name
   def initialize(name=:G, type=:digraph)
     @name, @type = name, type
     @edges = {}
@@ -10,7 +10,7 @@ class Gviz
     @subgraphs = []
     @ranks = []
   end
-  
+
   # Access to all defined node objects.
   def nodeset
     @nodes.values
@@ -108,8 +108,8 @@ class Gviz
   #     add :a => :b
   #   end
   #
-  def subgraph(&blk)
-    Gviz.new("cluster#{subgraphs.size}", :subgraph).tap do |graph|
+  def subgraph(name=:"cluster#{subgraphs.size}", &blk)
+    Gviz.new(name, :subgraph).tap do |graph|
       subgraphs << graph
       graph.instance_eval &blk
     end
