@@ -93,9 +93,6 @@ describe Gviz::Edge do
       it "returns undirected graph edges" do
         expect(Gviz::Edge.new('a_b').to_s).to eq "a -- b"
       end
-      after() do
-        $graph_type = :digraph
-      end
     end
   end
 end

@@ -10,7 +10,7 @@ end
 
 RSpec.configure do |c|
   c.include Helpers
-  c.before do
+  c.after do
     $graph_type = :digraph
   end
 end
