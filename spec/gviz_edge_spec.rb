@@ -84,4 +84,18 @@ describe Gviz::Edge do
       end
     end
   end
+
+  describe "#to_s" do
+    context "when type of graph is 'graph'" do
+      before do
+        $graph_type = :graph
+      end
+      it "returns undirected graph edges" do
+        expect(Gviz::Edge.new('a_b').to_s).to eq "a -- b"
+      end
+      after() do
+        $graph_type = :digraph
+      end
+    end
+  end
 end

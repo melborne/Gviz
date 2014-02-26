@@ -529,6 +529,51 @@ describe Gviz do
           EOS
       end
     end
+
+    context "for undirected graph" do
+      before do
+        @gv = Gviz.new(:G, :graph)
+        @gv.add :main => [:init, :parse]
+        @gv.add :init => :printf
+      end
+      subject { @gv.to_s }
+      it do
+        should eq ~<<-EOS
+          graph G {
+            main;
+            init;
+            parse;
+            printf;
+            main -- init;
+            main -- parse;
+            init -- printf;
+          }
+          EOS
+      end
+
+      context "with subgraph" do
+        before do
+          @gv = Gviz.new(:G, :graph)
+          @gv.route(:a => :b)
+          @gv.subgraph { route :c => :d }
+        end
+        subject { @gv.to_s }
+        it do
+          should eql ~<<-EOS
+            graph G {
+              subgraph cluster0 {
+                c;
+                d;
+                c -- d;
+              }
+              a;
+              b;
+              a -- b;
+            }
+            EOS
+        end
+      end
+    end
   end
 end
 

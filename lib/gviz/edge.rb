@@ -9,7 +9,8 @@ class Gviz::Edge < Struct.new(:id, :attrs)
   def to_s
     stp = ":#{st_port}" if st_port
     edp = ":#{ed_port}" if ed_port
-    "#{st}#{stp} -> #{ed}#{edp}"
+    edge = $graph_type==:graph ? "--" : "->"
+    "#{st}#{stp} #{edge} #{ed}#{edp}"
   end
 
   def nodes

@@ -2,6 +2,7 @@ class Gviz
   attr_reader :gnode_attrs, :gedge_attrs, :graph_attrs, :subgraphs, :ranks, :name
   def initialize(name=:G, type=:digraph)
     @name, @type = name, type
+    $graph_type = type.intern if type.intern==:graph
     @edges = {}
     @nodes = {}
     @gnode_attrs = {}

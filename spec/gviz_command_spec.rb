@@ -66,7 +66,7 @@ describe Gviz::Command do
           graph G {
             a;
             b;
-            a -> b;
+            a -- b;
           }
           EOS
       end
