@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Gviz : Yet Another Ruby&#39;s interface of graphviz" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Gviz</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/melborne/Gviz">View on GitHub</a>
+
+          <h1 id="project_title">Gviz</h1>
+          <h2 id="project_tagline">Yet Another Ruby&#39;s interface of graphviz</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/melborne/Gviz/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/melborne/Gviz/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="gviz" class="anchor" href="#gviz"><span class="octicon octicon-link"></span></a>Gviz</h1>
+
+<p><a href="https://travis-ci.org/melborne/Gviz"><img src="https://travis-ci.org/melborne/Gviz.png?branch=master" alt="Build Status"></a></p>
+
+<p>Ruby's interface of graphviz. It generate a dot file with simple ruby's syntax. Some implementations of <code>Gviz</code> are inspired by Ryan Davis's <a href="https://github.com/seattlerb/graph" title="seattlerb/graph">Graph</a>.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'gviz'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install gviz
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>A simple example.</p>
+
+<pre><code># add nodes and edges(route method)
+# save to files with dot and png formats(save method)
+require "gviz"
+
+Graph do
+  route :main =&gt; [:init, :parse, :cleanup, :printf]
+  route :init =&gt; :make, :parse =&gt; :execute
+  route :execute =&gt; [:make, :compare, :printf]
+
+  save(:sample1, :png)
+end
+</code></pre>
+
+<p><code>Graph</code> is a shortcut for <code>Gviz.new.graph</code>.</p>
+
+<p>This outputs <code>sample1.dot</code> and <code>sample1.png</code> files shown as below.</p>
+
+<p><img src="http://github.com/melborne/Gviz/raw/master/examples/sample1.png" alt="sample1"></p>
+
+<p>Add some attributes to the graph, nodes, edges.</p>
+
+<pre><code>## add color to all nodes with color set(nodes, nodeset and node methods)
+## add color &amp; styles to all edges(edges method)
+## add color &amp; styles to a edge(edge method)
+## add bgcolor to a graph(global method)
+require "gviz"
+
+Graph do
+  route :main =&gt; [:init, :parse, :cleanup, :printf]
+  route :init =&gt; :make, :parse =&gt; :execute
+  route :execute =&gt; [:make, :compare, :printf]
+
+  nodes(colorscheme:'piyg8', style:'filled')
+  nodeset.each.with_index(1) { |nd, i| node(nd.id, fillcolor:i) }
+  edges(arrowhead:'onormal', style:'bold', color:'magenta4')
+  edge(:main_printf, arrowtail:'diamond', dir:'both', color:'#3355FF')
+  global(bgcolor:'powderblue')
+
+  save(:sample2, :png)
+end
+</code></pre>
+
+<p>This outputs below.</p>
+
+<p><img src="http://github.com/melborne/Gviz/raw/master/examples/sample2.png" alt="sample2"></p>
+
+<p>Modify some.</p>
+
+<pre><code>## define specific edge port(node label &amp; edge method)
+## adjust node positions(rank method)
+## define subgraph(subgraph method) 
+require "gviz"
+
+Graph do
+  route :main =&gt; [:init, :parse, :cleanup, :printf]
+  route :init =&gt; :make, :parse =&gt; :execute
+  route :execute =&gt; [:make, :compare, :printf]
+
+  nodes colorscheme:'piyg8', style:'filled'
+  nodeset.each.with_index(1) { |nd, i| node nd.id, fillcolor:i }
+  edges arrowhead:'onormal', style:'bold', color:'magenta4'
+  edge :main_printf, arrowtail:'diamond', dir:'both', color:'#3355FF'
+  global bgcolor:'powderblue'
+
+  node :execute, shape:'Mrecord', label:'{&lt;x&gt;execute | {a | b | c}}'
+  node :printf, shape:'Mrecord', label:'{printf |&lt;y&gt; format}'
+  edge 'execute:x_printf:y'
+  rank :same, :cleanup, :execute
+  subgraph do
+    global label:'SUB'
+    node :init
+    node :make
+  end
+
+  save(:sample3, :png)
+end
+</code></pre>
+
+<p>This outputs below.</p>
+
+<p><img src="http://github.com/melborne/Gviz/raw/master/examples/sample3.png" alt="sample3"></p>
+
+<h2>
+<a name="use-for-drawing" class="anchor" href="#use-for-drawing"><span class="octicon octicon-link"></span></a>Use for Drawing</h2>
+
+<p>Gviz helps you easily to draw shapes on an exact position using shape-named methods.</p>
+
+<pre><code>require "gviz"
+
+Graph do
+  line :a, from:[-100,0], to:[100,0]
+  line :b, from:[0,-100], to:[0,100]
+  circle :c
+  rect :d, x:50, y:50, fillcolor:"green", label:"Rect"
+  triangle :e, x:50, y:-50, fillcolor:"cyan"
+  diamond :f, x:-50, y:50, fillcolor:"magenta"
+  egg :g, x:-50, y:-50, fillcolor:"yellow", label:"Egg"
+
+  save :draw
+end
+</code></pre>
+
+<p>This outputs below(consider a scale if save to output formats).</p>
+
+<p><img src="http://github.com/melborne/Gviz/raw/drawing/examples/sample4.png" alt="sample4"></p>
+
+<p>Another examples are at <code>examples</code> directory</p>
+
+<h2>
+<a name="gviz-command" class="anchor" href="#gviz-command"><span class="octicon octicon-link"></span></a>gviz command</h2>
+
+<p>It comes with a <code>gviz</code> command. This works with a graph spec file. If 'graph.ru' file exist on a directory of the execution, it will be automatically loaded as a graph spec file.</p>
+
+<p>Example of graph.ru:</p>
+
+<pre><code>  route :main =&gt; [:init, :parse, :cleanup, :printf]
+  route :init =&gt; :make, :parse =&gt; :execute
+  route :execute =&gt; [:make, :compare, :printf]
+
+  save(:sample, :png)
+</code></pre>
+
+<p>Usage:</p>
+
+<pre><code>  gviz build [FILE] [options]
+</code></pre>
+
+<p>where [options] are:</p>
+
+<pre><code>--name,   -n :   Graph name (default: G)
+--type,   -t :   Graph type (default: digraph)
+</code></pre>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Gviz maintained by <a href="https://github.com/melborne">melborne</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
