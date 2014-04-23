@@ -124,7 +124,7 @@ Gviz helps you easily to draw shapes on an exact position using shape-named meth
 
 This outputs below(consider a scale if save to output formats).
 
-![sample4](http://github.com/melborne/Gviz/raw/drawing/examples/sample4.png)
+![sample4](http://github.com/melborne/Gviz/raw/master/examples/sample4.png)
 
 Another examples are at `examples` directory
 
