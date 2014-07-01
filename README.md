@@ -38,7 +38,7 @@ A simple example.
 
 This outputs `sample1.dot` and `sample1.png` files shown as below.
 
-![sample1](http://github.com/melborne/Gviz/raw/master/examples/sample1.png)
+![sample1](https://github.com/melborne/Gviz/raw/master/examples/sample1.png)
 
 
 
@@ -66,7 +66,7 @@ Add some attributes to the graph, nodes, edges.
 
 This outputs below.
 
-![sample2](http://github.com/melborne/Gviz/raw/master/examples/sample2.png)
+![sample2](https://github.com/melborne/Gviz/raw/master/examples/sample2.png)
 
 
 Modify some.
@@ -102,7 +102,7 @@ Modify some.
 
 This outputs below.
 
-![sample3](http://github.com/melborne/Gviz/raw/master/examples/sample3.png)
+![sample3](https://github.com/melborne/Gviz/raw/master/examples/sample3.png)
 
 ## Use for Drawing
 
@@ -124,7 +124,7 @@ Gviz helps you easily to draw shapes on an exact position using shape-named meth
 
 This outputs below(consider a scale if save to output formats).
 
-![sample4](http://github.com/melborne/Gviz/raw/master/examples/sample4.png)
+![sample4](https://github.com/melborne/Gviz/raw/master/examples/sample4.png)
 
 Another examples are at `examples` directory
 
