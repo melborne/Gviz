@@ -229,7 +229,7 @@ class Gviz
   # the image is also created.
   def save(path, type=nil)
     File.open("#{path}.dot", "w") { |f| f.puts self }
-    system "dot -T#{type} #{path}.dot -o #{path}.#{type}" if type
+    system "dot", "-T", type.to_s, "#{path}.dot", "-o", "#{path}.#{type}" if type
   end
   
   private
